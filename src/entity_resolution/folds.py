@@ -38,8 +38,8 @@ def create_folds(
     """
     if not ground_truth:
         raise ValueError("Cannot create folds for empty ground truth.")
-    if n_splits < 2:
-        raise ValueError("n_splits must be >= 2.")
+    if not (2 <= n_splits <= len(ground_truth)):
+        raise ValueError("n_splits must be between 2 and number of ground_truth S1 entities.")
         
     s1_ids = sorted(list(ground_truth.keys()))
     strata = []
