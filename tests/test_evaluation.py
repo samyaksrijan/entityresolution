@@ -1,4 +1,6 @@
 
+import random
+
 import pandas as pd
 import pytest
 
@@ -32,6 +34,35 @@ def test_metrics_manual_cases():
     # precision = 0.5, recall = 1.0
     # F0.5 = 1.25 * 0.5 * 1 / (0.25 * 0.5 + 1) = 0.625 / 1.125 = 0.5555...
     assert pytest.approx(compute_per_s1_f0_5({"S2-1"}, {"S2-1", "S3-1"}), 0.0001) == 0.555555
+    
+    # 6. Truth {A,B}, prediction {A,B,C}:
+    # precision = 2/3, recall = 1
+    # F0.5 = 1.25 * (2/3) * 1 / (0.25 * (2/3) + 1) = 0.8333 / 1.1666... = 0.7142857142857143
+    assert pytest.approx(
+        compute_per_s1_f0_5({"S2-A", "S2-B"}, {"S2-A", "S2-B", "S3-C"}), 0.0001
+    ) == 0.714285
+    
+def test_metrics_property_randomized():
+    random.seed(42)
+    random.seed(42)
+    
+    s2_pool = [f"S2-{i}" for i in range(100)]
+    s3_pool = [f"S3-{i}" for i in range(100)]
+    pool = s2_pool + s3_pool
+    
+    for _ in range(1000):
+        t_len = random.randint(0, 10)
+        p_len = random.randint(0, 10)
+        
+        truth = set(random.sample(pool, t_len))
+        pred = set(random.sample(pool, p_len))
+        
+        gt = {"S1-1": list(truth)}
+        pd_ = {"S1-1": list(pred)}
+        
+        ref = evaluate_macro_f0_5_reference(gt, pd_)
+        eff, _ = evaluate_macro_f0_5_efficient(gt, pd_)
+        assert pytest.approx(ref, abs=1e-7) == eff
     
 def test_metrics_equivalence():
     gt = {
