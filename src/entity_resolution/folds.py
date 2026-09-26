@@ -12,6 +12,7 @@ def _get_cardinality_label(truth_list: list[str]) -> str:
         return "4+"
     return str(n)
 
+
 def _get_composition_label(truth_list: list[str]) -> str:
     if not truth_list:
         return "no_match"
@@ -25,6 +26,7 @@ def _get_composition_label(truth_list: list[str]) -> str:
         return "s3_only"
     return "unknown"
 
+
 def create_folds(
     ground_truth: dict[str, list[str]],
     countries: dict[str, str] | None = None,
@@ -33,11 +35,12 @@ def create_folds(
 ) -> tuple[dict[str, int], pd.DataFrame]:
     """
     Create deterministic S1-level fold assignment.
-    
-    Returns:
-        fold_assignment: Dict mapping S1 ID to fold index (0 to n_splits-1)
-        diagnostics: DataFrame showing distribution of strata across folds
     """
+    if not ground_truth:
+        raise ValueError("Cannot create folds for empty ground truth.")
+    if n_splits < 2:
+        raise ValueError("n_splits must be >= 2.")
+        
     s1_ids = sorted(list(ground_truth.keys()))
     strata = []
     
@@ -48,31 +51,34 @@ def create_folds(
         country = countries.get(s1, "unknown") if countries else "unknown"
         strata.append(f"{country}_{card}_{comp}")
         
-    # We use StratifiedKFold to handle stratification
-    # If a stratum has fewer members than n_splits, StratifiedKFold might warn/error.
-    # To avoid errors with very small strata, we group small strata.
     strata_counts = pd.Series(strata).value_counts()
-    valid_strata = [s if strata_counts[s] >= n_splits else "rare" for s in strata]
     
-    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+    valid_s1_ids = []
+    valid_strata = []
+    rare_s1_ids = []
     
+    for s1, s in zip(s1_ids, strata, strict=True):
+        if strata_counts[s] >= n_splits:
+            valid_s1_ids.append(s1)
+            valid_strata.append(s)
+        else:
+            rare_s1_ids.append(s1)
+
     fold_assignment = {}
-    fold_labels = []
     
-    # StratifiedKFold splits indices
-    for s1 in s1_ids:
-        fold_assignment[s1] = -1 # Placeholder
-        
-    X = np.zeros(len(s1_ids))
-    y = np.array(valid_strata)
-    
-    # We want to assign each S1 to exactly one validation fold
-    for fold_idx, (_train_idx, val_idx) in enumerate(skf.split(X, y)):
-        for idx in val_idx:
-            fold_assignment[s1_ids[idx]] = fold_idx
+    if valid_s1_ids:
+        skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+        X = np.zeros(len(valid_s1_ids))
+        for fold_idx, (_, val_idx) in enumerate(skf.split(X, valid_strata)):
+            for idx in val_idx:
+                fold_assignment[valid_s1_ids[idx]] = fold_idx
+                
+    # Deterministic round-robin assignment for rare strata
+    # since rare_s1_ids is already sorted
+    for i, s1 in enumerate(rare_s1_ids):
+        fold_assignment[s1] = i % n_splits
             
-    for s1 in s1_ids:
-        fold_labels.append(fold_assignment[s1])
+    fold_labels = [fold_assignment[s1] for s1 in s1_ids]
             
     df = pd.DataFrame({
         "s1_id": s1_ids,
@@ -84,10 +90,13 @@ def create_folds(
     
     return fold_assignment, diagnostics
 
+
 def save_folds(
     fold_assignment: dict[str, int],
     diagnostics: pd.DataFrame,
     output_dir: Path,
+    seed: int,
+    n_splits: int,
     format: str = "parquet"
 ) -> None:
     """
@@ -95,7 +104,10 @@ def save_folds(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    records = [{"s1_id": k, "fold": v} for k, v in fold_assignment.items()]
+    # deterministic order
+    sorted_s1_ids = sorted(list(fold_assignment.keys()))
+    records = [{"s1_id": s1, "fold": fold_assignment[s1]} for s1 in sorted_s1_ids]
+    
     df = pd.DataFrame(records)
     
     if format == "parquet":
@@ -104,9 +116,13 @@ def save_folds(
         df.to_csv(output_dir / "folds.tsv", sep="\t", index=False)
         
     metadata = {
+        "strategy_version": "1.0",
         "n_entities": len(fold_assignment),
-        "n_folds": df["fold"].nunique(),
-        "format": format
+        "n_splits": n_splits,
+        "seed": seed,
+        "format": format,
+        "stratum_definitions": ["country", "cardinality", "composition"],
+        "diagnostics": diagnostics.to_dict(orient="index")
     }
     
     with open(output_dir / "folds_metadata.json", "w") as f:
