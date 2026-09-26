@@ -1,0 +1,39 @@
+# Organizer-supplied, immutable competition resources
+/student_resource/
+
+# Environments and Python/tool caches
+/.venv/
+/venv/
+/.mypy_cache/
+/.pytest_cache/
+/.ruff_cache/
+/.coverage
+/htmlcov/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Generated artifacts and large intermediate data
+/artifacts/**
+!/artifacts/.gitkeep
+/reports/figures/**
+!/reports/figures/.gitkeep
+*.joblib
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.parquet
+*.feather
+*.arrow
+*.cbm
+
+# Final generated outputs
+/output/**
+!/output/.gitkeep
+
+# Local/editor files
+.DS_Store
+.idea/
+.vscode/
+

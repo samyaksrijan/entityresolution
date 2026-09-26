@@ -1,0 +1,11 @@
+train_source1: student_resource/dataset/train/train_source1.tsv
+train_source2: student_resource/dataset/train/train_source2.tsv
+train_source3: student_resource/dataset/train/train_source3.tsv
+train_ground_truth: student_resource/dataset/train/train_ground_truth.tsv
+test_source1: student_resource/dataset/test/test_source1.tsv
+test_source2: student_resource/dataset/test/test_source2.tsv
+test_source3: student_resource/dataset/test/test_source3.tsv
+validate_submission: student_resource/utils/validate_submission.py
+documentation_template: student_resource/Documentation_template.md
+problem_statement: student_resource/README.md
+
