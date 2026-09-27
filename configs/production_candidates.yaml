@@ -1,0 +1,31 @@
+# K is a total per-query budget; exact matches and indistinguishable boundary ties survive.
+# Parser/query batches and matrix blocks are bounded independently of corpus size.
+runtime:
+  # Four small fitted v1 assets; no labels are stored or read. Set null to fit afresh.
+  vectorizer_root: artifacts/blocking
+  batch_size: 1000
+  shard_size: 1000
+  threads: 4
+  index_block_size: 20000
+  fit_sample_size: 75000
+  max_evidence_rows: 2000000
+  sparse:
+    ngram_min: 3
+    ngram_max: 5
+    min_df: 2
+    max_features: 50000
+    threshold: 0.20
+    top_k: 80
+profiles:
+  safe_k40:
+    top_k: 40
+    rrf_k: 60
+  emergency_k20:
+    top_k: 20
+    rrf_k: 60
+  stretch_adaptive:
+    top_k: 40
+    expanded_k: 400
+    adaptive: true
+    rrf_k: 60
+    source_quotas: {S2: 20, S3: 20}

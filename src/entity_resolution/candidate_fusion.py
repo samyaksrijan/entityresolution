@@ -1273,3 +1273,157 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def query_quality(evidence: pd.DataFrame, name: object, address: object) -> dict[str, Any]:
+    """Label-free gate; missing evidence always takes the expanded fallback."""
+    evidence = evidence.sort_values(
+        ["channel_rank", "retrieval_score"], ascending=[True, False], kind="stable"
+    ).drop_duplicates(["target_source", "target_id", "channel"])
+    n, a = normalize_field(name), normalize_field(address)
+    fuzzy = evidence.loc[~evidence["exact_match"].astype(bool)]
+    margins = []
+    for _, group in fuzzy.groupby(["target_source", "channel"], observed=True):
+        scores = group.sort_values("channel_rank")["retrieval_score"].to_numpy()
+        margins.append(float(scores[0] - scores[1]) if len(scores) > 1 else 1.0)
+    support = evidence.groupby(["target_source", "target_id"])["channel"].nunique()
+    result = {
+        "missing_name": not bool(n.unicode_preserving),
+        "missing_address": not bool(a.unicode_preserving),
+        "name_length": len(n.unicode_preserving),
+        "address_length": len(a.unicode_preserving),
+        "minimum_margin": min(margins, default=0.0),
+        "maximum_agreement": int(support.max()) if len(support) else 0,
+        "has_exact": bool(evidence["exact_match"].any()),
+        "viable_views": int(fuzzy["channel"].nunique()),
+    }
+    result["weak"] = bool(
+        result["missing_name"]
+        or result["missing_address"]
+        or result["name_length"] < 5
+        or result["address_length"] < 8
+        or not result["has_exact"]
+        or result["minimum_margin"] < 0.05
+        or result["maximum_agreement"] < 2
+        or result["viable_views"] < 2
+    )
+    return result
+
+
+def fuse_budgeted(
+    evidence: pd.DataFrame, queries: pd.DataFrame, policy: dict[str, Any], *, run_id: str
+) -> tuple[pd.DataFrame, dict[str, int]]:
+    """Weighted RRF with source/channel reservations, spillover, and exact retention.
+
+    Required evidence includes target_content_key. Identical content boundary ties
+    expand together, as in select_candidates. Quotas reserve seats within K; unused
+    seats spill into global RRF order. Exact overflow is never discarded. The primary
+    channel describes one observation; support_json retains every channel observation.
+    """
+    columns = [
+        "s1_id",
+        "target_id",
+        "target_source",
+        "channel",
+        "retrieval_score",
+        "channel_rank",
+        "exact_match",
+        "run_id",
+        "support_json",
+        "fusion_score",
+    ]
+    if not set(evidence["s1_id"]) <= set(queries["entity_id"]):
+        raise ValueError("evidence contains unknown query")
+    k = int(policy["top_k"])
+    expanded = int(policy.get("expanded_k", k))
+    if not 0 < k <= expanded <= 32767:
+        raise ValueError("invalid candidate budget")
+    quotas = policy.get("source_quotas", {})
+    channels = policy.get("channel_quotas", {})
+    if set(quotas) - {"S2", "S3"} or any(int(v) < 0 for v in quotas.values()):
+        raise ValueError("invalid source quotas")
+    if sum(quotas.values()) > k or sum(channels.values()) > k:
+        raise ValueError("reservations exceed base budget")
+    if any(int(v) < 0 for v in channels.values()):
+        raise ValueError("invalid channel quotas")
+    rrf_k = float(policy.get("rrf_k", 60))
+    if rrf_k <= 0:
+        raise ValueError("rrf_k must be positive")
+    weights = policy.get("channel_weights", {})
+    if any(not np.isfinite(v) or v <= 0 for v in weights.values()):
+        raise ValueError("channel weights must be finite and positive")
+    groups = {key: group for key, group in evidence.groupby("s1_id", sort=False)}
+    output, activated = [], 0
+    for query in queries.itertuples(index=False):
+        part = groups.get(query.entity_id, evidence.iloc[:0])
+        quality = query_quality(part, query.business_name, query.business_address)
+        expand = bool(policy.get("adaptive", False) and quality["weak"])
+        activated += int(expand)
+        budget = expanded if expand else k
+        # One observation per pair/channel: repeated shards cannot inflate RRF/support.
+        part = part.sort_values(
+            ["channel_rank", "retrieval_score"], ascending=[True, False], kind="stable"
+        ).drop_duplicates(["target_source", "target_id", "channel"])
+        candidates = []
+        by_pair: dict[tuple[str, str], list[Any]] = {}
+        for row in part.itertuples(index=False):
+            by_pair.setdefault((row.target_source, row.target_id), []).append(row)
+        for (source, target), observations in by_pair.items():
+            observations.sort(key=lambda row: (not row.exact_match, row.channel_rank, row.channel))
+            first = observations[0]
+            support = [
+                {
+                    "channel": str(row.channel),
+                    "score": float(row.retrieval_score),
+                    "rank": int(row.channel_rank),
+                    "exact": bool(row.exact_match),
+                }
+                for row in sorted(observations, key=lambda row: row.channel)
+            ]
+            score = sum(
+                float(weights.get(f"{source}:{row['channel']}", weights.get(row["channel"], 1)))
+                / (rrf_k + row["rank"])
+                for row in support
+            )
+            candidates.append(
+                {
+                    "s1_id": query.entity_id,
+                    "target_id": target,
+                    "target_source": source,
+                    "channel": first.channel,
+                    "retrieval_score": float(first.retrieval_score),
+                    "channel_rank": int(first.channel_rank),
+                    "exact_match": bool(first.exact_match),
+                    "run_id": run_id,
+                    "support_json": json.dumps(support, separators=(",", ":")),
+                    "fusion_score": score,
+                    "_channels": {v["channel"] for v in support},
+                    "_key": (-score, -len(support), str(first.target_content_key)),
+                }
+            )
+        candidates.sort(key=lambda row: row["_key"])
+        chosen = {i for i, row in enumerate(candidates) if row["exact_match"]}
+
+        def reserve(
+            indices: list[int], count: int, *, budget=budget, chosen=chosen, candidates=candidates
+        ) -> None:
+            remaining = max(0, min(count, budget - len(chosen)))
+            available = [i for i in indices if i not in chosen]
+            added = available[:remaining]
+            if added:
+                boundary = candidates[added[-1]]["_key"]
+                added.extend(i for i in available[remaining:] if candidates[i]["_key"] == boundary)
+                chosen.update(added)
+
+        for source, quota in sorted(quotas.items()):
+            indices = [i for i, row in enumerate(candidates) if row["target_source"] == source]
+            reserve(indices, max(0, int(quota) - len(chosen.intersection(indices))))
+        for channel, quota in sorted(channels.items()):
+            indices = [i for i, row in enumerate(candidates) if channel in row["_channels"]]
+            reserve(indices, max(0, int(quota) - len(chosen.intersection(indices))))
+        reserve(list(range(len(candidates))), budget - len(chosen))
+        output.extend({key: candidates[i][key] for key in columns} for i in sorted(chosen))
+    frame = pd.DataFrame(output, columns=columns)
+    # IDs only serialize an already selected set; no ID component is a ranking feature.
+    frame = frame.sort_values(["s1_id", "target_source", "target_id"], kind="stable")
+    return frame.reset_index(drop=True), {"adaptive_queries": activated, "queries": len(queries)}
