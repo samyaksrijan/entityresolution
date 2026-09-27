@@ -264,3 +264,31 @@ def test_submission_writer(tmp_path):
     match3 = {"S1-1": ["S2-1"]}
     with pytest.raises(SubmissionError, match="Duplicate candidates"):
         write_submission(all_s1, valid_targets, cand3, match3, tmp_path, "run3")
+
+
+def test_decoder_ownership_margin():
+    all_s1 = {"S1-1", "S1-2", "S1-3"}
+    dec = Decoder(enforce_target_ownership=True, score_margin=0.2)
+
+    candidates = pd.DataFrame([
+        # 1. A target with only one eligible owner survives when score_margin > 0.
+        {"s1_id": "S1-1", "target_id": "S2-1", "target_source": "S2", "score": 0.9},
+
+        # 2. A target with two owners is rejected when gap < margin.
+        {"s1_id": "S1-2", "target_id": "S2-2", "target_source": "S2", "score": 0.8},
+        {"s1_id": "S1-3", "target_id": "S2-2", "target_source": "S2", "score": 0.7},
+
+        # 3. A target with two owners is retained for the higher-scoring owner when gap >= margin.
+        {"s1_id": "S1-2", "target_id": "S2-3", "target_source": "S2", "score": 0.9},
+        {"s1_id": "S1-3", "target_id": "S2-3", "target_source": "S2", "score": 0.6},
+    ])
+
+    res = dec.decode(candidates, all_s1)
+
+    assert "S2-1" in res["S1-1"]
+    assert "S2-2" not in res["S1-2"] and "S2-2" not in res["S1-3"]
+    assert "S2-3" in res["S1-2"] and "S2-3" not in res["S1-3"]
+
+    # 4. Result remains identical after shuffling the input candidate rows.
+    res_shuffled = dec.decode(candidates.sample(frac=1, random_state=42), all_s1)
+    assert res == res_shuffled

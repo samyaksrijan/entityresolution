@@ -91,9 +91,17 @@ class Decoder:
             df["_owner_rank"] = df.groupby("target_id").cumcount()
 
             if self.score_margin is not None:
-                best = df[df["_owner_rank"] == 0].set_index("target_id")["score"]
-                second = df[df["_owner_rank"] == 1].set_index("target_id")["score"]
-                margin_ok = (best - second).ge(self.score_margin) | second.isna()
+                best = df.loc[
+                    df["_owner_rank"].eq(0)
+                ].set_index("target_id")["score"]
+
+                second = (
+                    df.loc[df["_owner_rank"].eq(1)]
+                    .set_index("target_id")["score"]
+                    .reindex(best.index)
+                )
+
+                margin_ok = second.isna() | (best - second).ge(self.score_margin)
 
                 df_best = df[df["_owner_rank"] == 0].copy()
                 valid_targets = margin_ok[margin_ok].index
