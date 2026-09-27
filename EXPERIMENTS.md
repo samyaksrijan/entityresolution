@@ -46,3 +46,21 @@ pair and Parquet sizes, and subgroup tables are in `reports/candidate_generation
 No configuration qualifies for production. Word TF-IDF was optional and was not retained. No
 final pair classifier, cross-encoder, neural model, competition candidate TSV, or test prediction
 was produced.
+
+## 2026-09-27 — Candidate fusion v2
+
+Validated 1,693,164 persisted evidence rows and aggregated 1,595,284 distinct pairs on the fixed
+diagnostic sample. Evaluated RRF, exact-first, source-specific weights, global budgets
+20/30/40/50/75/100, six S2/S3 budget pairs, and evidence-triggered adaptive rescue. Exact
+candidates were mandatory and content/evidence ties at selection boundaries were expanded.
+
+Development folds 0–2 selected `rrf|global=40|rrf_k=60`. On held-out folds 3–4 it recovered
+4,907 of 5,371 positive edges (91.361%), recovered all truth for 84.050% of S1 entities, reached
+0.95751 oracle macro F0.5, and produced 43.78 mean, 40 median, 40 p90, 64 p95, 155.01 p99, and
+187 maximum candidates. Worst-fold recall was 90.797% and worst-fold oracle was 0.95382.
+
+The held-out audit contains 464 missed edges: 158 are absent from all existing top-80 channels,
+59 have a missing target address, 366 have weak/missing name evidence, 238 are India cases, 264
+are S3 edges, and 357 are multi-match truncations (flags overlap). A disjoint 5,000-row uniform
+content-hash sample was created without truth or retrieval inputs and reserved for validation of
+the post-rescue configuration. No final uniform metric is claimed for the rejected fusion.

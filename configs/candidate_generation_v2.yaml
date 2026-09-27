@@ -1,0 +1,59 @@
+run_id: candidate_generation_v2
+input_run_id: candidate_generation_v1
+seed: 20260927
+artifact_root: artifacts/blocking
+v1_config: configs/candidate_generation_v1.yaml
+data_paths_config: configs/data_paths.yaml
+diagnostic_sample: artifacts/blocking/evaluation_sample_s1_ids.parquet
+expected_artifact_sha256:
+  evaluation_sample_s1_ids.parquet: 17f9f535c5f107330ddfc449af7ce3b182c29c455c56e071b70fd75be1422ab4
+  S2_exact_evidence.parquet: 9b6fa4dfde3a8d431be06ce5ee01b21b0f164d8c3485eb5157eacdab32ac940b
+  S2_name_char_top80.parquet: 6ea8caf4271c819b6425b177caf4d1f2713468861f6d3c274f0aa06a7fe03e96
+  S2_address_char_top80.parquet: 67c1cabbe471d25a70cbc56b2eae2b268eed76b755c6299039aeeef754609f46
+  S3_exact_evidence.parquet: 2490cb3e027196848d9582076f0d170cd103ce31439a7c4bf6f632fe4671a4b0
+  S3_name_char_top80.parquet: 12c046c7238f7e47f1ba93171695b635cee303ff21aebe9116283813becabec8
+  S3_address_char_top80.parquet: 15bdcdf42f953d8e257011ed47ce05509755a926bf374deb6096f1822e8fee1c
+uniform_sample: artifacts/blocking_v2/uniform_sample_s1_ids.parquet
+uniform_sample_size: 5000
+folds:
+  count: 5
+  development: [0, 1, 2]
+  held_out: [3, 4]
+fusion:
+  rrf_k: 60
+  global_budgets: [20, 30, 40, 50, 75, 100]
+  source_budget_pairs:
+    - [10, 10]
+    - [15, 15]
+    - [20, 20]
+    - [25, 25]
+    - [20, 30]
+    - [30, 20]
+  strategies: [rrf, exact_first, source_specific]
+  adaptive:
+    enabled: true
+    base_budget: 30
+    rescue_budget: 20
+    conditions: [no_exact_evidence, single_support_channel]
+  source_specific_weights:
+    S2:
+      name: 1.0
+      address: 1.0
+      exact: 1.0
+    S3:
+      name: 1.15
+      address: 0.9
+      exact: 1.0
+gates:
+  positive_edge_recall: 0.985
+  oracle_macro_f0_5: 0.99
+  mean_candidates: 50
+  p95_candidates: 100
+estimation:
+  train_s1_rows: 2206821
+  test_s1_rows: 1732544
+  parquet_bytes_per_pair: 32
+outputs:
+  report_markdown: reports/candidate_generation_v2.md
+  report_json: reports/candidate_generation_v2.json
+  missed_edges: reports/missed_edges_v2.tsv
