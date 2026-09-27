@@ -1,0 +1,465 @@
+s1_id	target_id	target_source	country	truth_cardinality	retrieved_channels	target_address_missing	weak_or_missing_name_evidence	name_retrieved_below_selected_budget	address_retrieved_below_selected_budget	absent_from_every_existing_top80_channel	duplicate_common_normalized_signature	accent_unicode_normalization_issue	legal_suffix_or_token_order_variation	india_specific_concentration	s3_specific_concentration	multi_match_truncation	query_name_token_count	target_name_token_count	query_address_missing	redacted_content_key	name_char_rank	address_char_rank	normalized_signature_frequency	primary_category
+S1-262104337	S2-128043836	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	3	8	False	eef9f326fdb17b18		46.0	1	multi_match_truncation
+S1-880648436	S3-618390145	S3	India	8		False	True	False	False	True	False	False	False	True	True	True	4	5	False	e5f546a79b091f1d			1	absent_top80_weak_name
+S1-857156550	S3-759969322	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	4	4	False	6aca21fc60bd2a7f			1	absent_top80_weak_name
+S1-584114836	S3-376826381	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	1	False	002f0803e51c1eec		2.0	1	multi_match_truncation
+S1-765530643	S2-811089522	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	3	3	False	a6d2cfe20a62131f		22.0	1	multi_match_truncation
+S1-623960489	S3-749513413	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	fb16f310446e7a06		12.0	1	multi_match_truncation
+S1-952560412	S2-759776596	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	04efe112e2ae96ac		1.0	1	multi_match_truncation
+S1-17178390	S3-465296339	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	6	4	False	4c644c25d02523fd		16.0	1	multi_match_truncation
+S1-216753260	S3-857617961	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	2	False	2cc22c82f12135ca		1.0	1	multi_match_truncation
+S1-426064426	S3-153122268	S3	India	2		False	True	False	False	True	False	False	False	True	True	False	3	10	False	d62ee5205ffa01a2			1	absent_top80_weak_name
+S1-426064426	S3-916660775	S3	India	2	name_char_tfidf	True	False	True	False	False	True	False	True	True	True	False	3	2	False	8313e1499b7d3a89	12.0		2	name_evidence_fusion_truncation
+S1-211348621	S3-595866250	S3	India	7		False	True	False	False	True	False	False	False	True	True	True	4	10	False	40e267914508f04a			1	absent_top80_weak_name
+S1-105040091	S3-3675409	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	False	4	4	False	7072571f33218114		69.0	1	address_evidence_fusion_truncation
+S1-105040091	S3-395663767	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	False	4	13	False	737a9df7cf5ebf45		68.0	1	address_evidence_fusion_truncation
+S1-105040091	S3-840590014	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	13	False	e4eb00d3bdfacd3d			1	absent_top80_weak_name
+S1-608228429	S3-546705982	S3	India	5		False	True	False	False	True	False	False	False	True	True	True	3	3	False	0ef9fafd50dca0bf			1	absent_top80_weak_name
+S1-763236343	S2-444825922	S2	US	2		False	True	False	False	True	False	False	False	False	False	True	4	5	False	918134f1572deae8			1	absent_top80_weak_name
+S1-32187910	S2-80202403	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	5	15	False	af5eff7e971172b0		19.0	1	multi_match_truncation
+S1-482415915	S2-266458869	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	3	13	False	4e2d19867456494b			1	absent_top80_weak_name
+S1-703850100	S2-827716417	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	4	False	a992d2473c9f63ec			1	absent_top80_weak_name
+S1-580120199	S3-256342181	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	5	2	False	99b881c275a9d136	76.0		1	multi_match_truncation
+S1-763757953	S3-730732171	S3	US	3	name_char_tfidf	True	False	True	False	False	True	False	True	False	True	True	2	3	False	91c81c2c41b755e0	43.0		2	multi_match_truncation
+S1-985266965	S2-805378398	S2	India	2	address_char_tfidf	False	True	False	True	False	True	False	False	True	False	False	4	14	False	220a833472723229		13.0	2	address_evidence_fusion_truncation
+S1-985266965	S2-933827830	S2	India	2	address_char_tfidf	False	True	False	True	False	True	False	False	True	False	False	4	14	False	220a833472723229		14.0	2	address_evidence_fusion_truncation
+S1-931547219	S2-148114386	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	15	False	2efc423623b84620			1	absent_top80_weak_name
+S1-931547219	S2-842314342	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	15	False	0274c9d6768f3247			1	absent_top80_weak_name
+S1-931547219	S3-882939301	S3	India	5		False	True	False	False	True	False	False	False	True	True	True	4	15	False	484045d5b1c8071d			1	absent_top80_weak_name
+S1-482718929	S3-364308150	S3	India	2		False	True	False	False	True	False	False	False	True	True	True	3	3	False	b181965b2b2664af			1	absent_top80_weak_name
+S1-39642096	S3-950823130	S3	US	1	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	False	1	2	False	29933a409cce9311		1.0	1	address_evidence_fusion_truncation
+S1-592167090	S3-591450680	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	4	2	False	cf6a68fcbfbdfa6d		2.0	1	address_evidence_fusion_truncation
+S1-592167090	S3-686892088	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	4	2	False	f81741221b344582		1.0	1	address_evidence_fusion_truncation
+S1-759868308	S2-894115198	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	2	3	False	4dfe595e9802d118		1.0	1	multi_match_truncation
+S1-419097226	S3-644578220	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	22816d704a86805d		3.0	1	multi_match_truncation
+S1-246299553	S3-614802635	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	2	False	d27e92873f5954cf		2.0	1	multi_match_truncation
+S1-867119856	S3-33239850	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	3	5	False	5d135439445f80a9			1	absent_top80_weak_name
+S1-476242580	S2-911364288	S2	US	2		False	True	False	False	True	False	False	False	False	False	True	2	2	False	69923509531a8e3d			1	absent_top80_weak_name
+S1-921060051	S2-11893335	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	17	False	a09752e147657849			1	absent_top80_weak_name
+S1-788861089	S3-489659682	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	1	False	643c6a186ad71d22			1	absent_top80_weak_name
+S1-649775392	S2-387361027	S2	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	1	1	False	3e7f7bb5e3d8e983		3.0	1	multi_match_truncation
+S1-649775392	S2-727340684	S2	US	5	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	1	2	False	bac334a64a12f6aa		2.0	1	multi_match_truncation
+S1-649775392	S3-166562253	S3	US	5	address_char_tfidf	False	True	False	True	False	False	True	True	False	True	True	1	1	False	e4bc1954534f08d0		1.0	1	multi_match_truncation
+S1-649775392	S3-690577486	S3	US	5		False	True	False	False	True	False	False	False	False	True	True	1	2	False	7cd46897372fb5ad			1	absent_top80_weak_name
+S1-416680918	S2-831573500	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	db13f06e8a423051		1.0	1	address_evidence_fusion_truncation
+S1-416680918	S2-909268903	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	1	False	14bafc12cb85fad4		2.0	1	address_evidence_fusion_truncation
+S1-416680918	S2-96827622	S2	US	4	address_char_tfidf	False	True	False	True	False	False	True	True	False	False	False	2	2	False	a845f37bf755d12c		4.0	1	address_evidence_fusion_truncation
+S1-416680918	S2-96998661	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	7bff1978dbd4679b		3.0	1	address_evidence_fusion_truncation
+S1-20003321	S3-137258946	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	2	False	403336047276b713		40.0	1	multi_match_truncation
+S1-20003321	S3-222365327	S3	India	5		True	True	False	False	True	False	False	False	True	True	True	4	4	False	4fd241f91bf40d2b			1	absent_top80_target_address_missing
+S1-20003321	S3-551807484	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	14	False	93df709fc193e613		41.0	1	multi_match_truncation
+S1-693656757	S2-841001685	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	4	False	509075b4050ab129		12.0	1	multi_match_truncation
+S1-288420591	S2-416899877	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	True	3	3	False	54d56acd935f8517	10.0	1.0	1	multi_match_truncation
+S1-288420591	S2-564131995	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	4	False	b1408bcccc78687e		2.0	1	multi_match_truncation
+S1-288180426	S2-462799591	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	2	False	0b06e7dcaa5dfbdd		2.0	1	multi_match_truncation
+S1-70070585	S3-190059316	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	False	4	4	False	326840d11db28007		64.0	1	address_evidence_fusion_truncation
+S1-70070585	S3-418251513	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	False	4	3	False	270fac57605401e6		17.0	1	address_evidence_fusion_truncation
+S1-503105914	S2-608790657	S2	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	False	2	2	False	ad5d691e971c2c4a	73.0	2.0	1	name_evidence_fusion_truncation
+S1-503105914	S2-618474036	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	b8392861ff40bb69		1.0	1	address_evidence_fusion_truncation
+S1-422863968	S3-408432658	S3	US	4		True	True	False	False	True	False	False	False	False	True	True	3	2	False	6bd656eca18f7cb4			1	absent_top80_target_address_missing
+S1-894910835	S3-75664777	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	4	False	0ef862b5e06c6407		3.0	1	multi_match_truncation
+S1-229935904	S2-302569826	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	2	False	1c43306eb9855ae9		1.0	1	address_evidence_fusion_truncation
+S1-229935904	S2-669738940	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	3	2	False	4b91d78d48bb8d52		19.0	1	address_evidence_fusion_truncation
+S1-499846161	S2-980766014	S2	US	3	name_char_tfidf	True	False	True	False	False	False	False	False	False	False	True	3	3	False	5b4fc96ea57a61f3	18.0		1	multi_match_truncation
+S1-689335022	S3-588992318	S3	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	True	2	3	False	a013fe4d2df9ece9	52.0	3.0	1	multi_match_truncation
+S1-154872548	S3-413955258	S3	India	2		False	True	False	False	True	False	False	False	True	True	True	4	4	False	8af5337b557a4e49			1	absent_top80_weak_name
+S1-811385924	S2-642844079	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	14	False	bb31d1612f0c65f3		11.0	1	multi_match_truncation
+S1-652948304	S2-582049026	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	13	False	966a875faf2ac8b3			1	absent_top80_weak_name
+S1-652948304	S3-524857622	S3	India	5		False	True	False	False	True	False	False	False	True	True	True	4	4	False	80e2d03b27248dad			1	absent_top80_weak_name
+S1-291778653	S2-978599030	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	cb1dd26e0a6de088		4.0	1	multi_match_truncation
+S1-495926677	S3-430204571	S3	US	4	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	True	3	4	False	88fdc84a0fb12d39	65.0	1.0	1	multi_match_truncation
+S1-495926677	S3-70500121	S3	US	4	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	True	3	3	False	69f5ff5c821e61a5	11.0	4.0	1	multi_match_truncation
+S1-495926677	S3-807078586	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	4	False	718ac7a32943a1d0		3.0	1	multi_match_truncation
+S1-712144127	S3-195934960	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	2	2	False	ecf4114ee415cd36			1	absent_top80_weak_name
+S1-527713353	S2-111164405	S2	US	1	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	False	2	3	False	d9bc5eb6154d705d	65.0	1.0	1	name_evidence_fusion_truncation
+S1-562248843	S2-895997192	S2	India	3		False	True	False	False	True	False	False	False	True	False	True	4	12	False	38f62edba1b4cccc			1	absent_top80_weak_name
+S1-667187002	S3-17756187	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	3	False	71ed1e4f8623af8a	18.0		1	multi_match_truncation
+S1-22314503	S3-301750637	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	1	False	c23d864daa8d20ff		7.0	1	address_evidence_fusion_truncation
+S1-22314503	S3-8259488	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	3	False	255b686397d4ed5c		4.0	1	address_evidence_fusion_truncation
+S1-734675082	S2-818391333	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	3	13	False	e79309b3db7f8ad4			1	absent_top80_weak_name
+S1-734675082	S3-304298286	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	3	13	False	3a79f21fcdf2ef8d			1	absent_top80_weak_name
+S1-467951063	S3-207536145	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	True	3	2	False	59ffa93675497b68		1.0	1	multi_match_truncation
+S1-467951063	S3-59170344	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	4	False	f3f2dc00c3ba07d5		3.0	1	multi_match_truncation
+S1-634256042	S3-34072964	S3	India	1	name_char_tfidf	False	False	True	False	False	False	False	True	True	True	False	4	4	False	b2c963a6aee72f4a	19.0		1	name_evidence_fusion_truncation
+S1-830924154	S3-296279288	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	4	False	38194535e5c04bc4			1	absent_top80_weak_name
+S1-830924154	S3-711371320	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	4	False	8402fad37efd42ec			1	absent_top80_weak_name
+S1-830924154	S3-774084239	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	False	4	3	False	aefd4e808cbec316	13.0		1	name_evidence_fusion_truncation
+S1-580630665	S3-562717199	S3	India	3		True	True	False	False	True	False	False	False	True	True	True	3	3	False	81eefce867070c62			1	absent_top80_target_address_missing
+S1-422541278	S2-149334699	S2	India	4		True	True	False	False	True	False	False	False	True	False	True	2	2	False	70586cecadab804e			1	absent_top80_target_address_missing
+S1-446287876	S2-526554560	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	611f16c366871045		2.0	1	address_evidence_fusion_truncation
+S1-446287876	S2-592622859	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	5	False	ef3019919e9cb889		1.0	1	address_evidence_fusion_truncation
+S1-446287876	S2-715579392	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	03d7737e08d1da31		3.0	1	address_evidence_fusion_truncation
+S1-446287876	S3-716705797	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	2	False	d0e80a58b710f39e		1.0	1	address_evidence_fusion_truncation
+S1-754889931	S2-907558344	S2	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	False	2	3	False	f73727a8d240f59c	43.0	11.0	1	name_evidence_fusion_truncation
+S1-754889931	S2-961899952	S2	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	False	2	3	False	932046bd9e437ba4	50.0	2.0	1	name_evidence_fusion_truncation
+S1-969857386	S2-57917699	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	3	3	False	43ea34f31e12bae8			1	absent_top80_weak_name
+S1-969857386	S3-483840432	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	3	9	False	8c1d8106f7bcaae7			1	absent_top80_weak_name
+S1-900353525	S3-411657553	S3	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	5	False	e9e352789693ddd7	42.0		1	multi_match_truncation
+S1-648946731	S3-154521833	S3	US	3		False	True	False	False	True	False	False	False	False	True	True	2	2	False	4f774332948aec15			1	absent_top80_weak_name
+S1-648946731	S3-504122239	S3	US	3		True	True	False	False	True	False	False	False	False	True	True	2	2	False	3612da3bbc245b61			1	absent_top80_target_address_missing
+S1-495250170	S3-993604658	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	4	9	False	7b054be2eeb3a164			1	absent_top80_weak_name
+S1-769363234	S3-407429667	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	3	False	2bdc15a60420b7a2	52.0		1	multi_match_truncation
+S1-700025371	S3-778432959	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	3	3	False	b615ead4bde1f3d1		11.0	1	multi_match_truncation
+S1-930712810	S2-568513373	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	False	2	3	False	1c86ca7a6e86772a	55.0	2.0	1	name_evidence_fusion_truncation
+S1-930712810	S3-470935156	S3	US	3	name_char_tfidf	True	False	True	False	False	False	False	True	False	True	False	2	3	False	7d1ee2c0f409a839	44.0		1	name_evidence_fusion_truncation
+S1-930712810	S3-509902658	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	2	False	f7bb1377acae9c35		1.0	1	address_evidence_fusion_truncation
+S1-834475992	S2-327450829	S2	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	18	False	05e370b0d7081937		39.0	1	multi_match_truncation
+S1-573184335	S3-144291745	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	True	True	True	True	5	5	False	603403fc970e903d	18.0		1	multi_match_truncation
+S1-662648294	S3-367224223	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	4	False	87c8cff4b9e0cb78		1.0	1	multi_match_truncation
+S1-603402436	S3-428613230	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	2	False	b3e42efaeb6f28db			1	absent_top80_weak_name
+S1-237460963	S3-217719570	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	2	False	742515adac951509		1.0	1	multi_match_truncation
+S1-478565543	S2-146521459	S2	US	3	name_char_tfidf	True	False	True	False	False	False	False	True	False	False	True	1	2	False	bd5f1440d5d276ba	73.0		1	multi_match_truncation
+S1-543067277	S3-525767527	S3	India	4	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	83198dd104d0b980	32.0		1	multi_match_truncation
+S1-36567469	S3-96569696	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	2	2	False	70c5879d70a60320			1	absent_top80_weak_name
+S1-350515627	S3-750141820	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	f2893ec45ca8b220	16.0		1	multi_match_truncation
+S1-719419063	S2-784456932	S2	India	1	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	True	False	False	4	3	False	6c6ab4b5c26e4d3d	57.0	3.0	1	name_evidence_fusion_truncation
+S1-84075733	S2-210712486	S2	US	5	name_char_tfidf	False	False	True	False	False	False	False	True	False	False	True	4	5	False	3851519b5bc6a7b4	29.0		1	multi_match_truncation
+S1-652938256	S3-909959246	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	2	2	False	43203ffca1e9eb99		24.0	1	multi_match_truncation
+S1-513535349	S3-523638622	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	14	False	3fffffc69859424b		28.0	1	multi_match_truncation
+S1-63346809	S3-743810428	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	1	False	c304efbe36380ad8		1.0	1	multi_match_truncation
+S1-459626320	S3-653020771	S3	US	4		True	True	False	False	True	False	False	False	False	True	True	5	5	False	899b0528b28e1af4			1	absent_top80_target_address_missing
+S1-866626169	S3-266679027	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	ef7c6a057616aa4f	24.0		1	multi_match_truncation
+S1-286288423	S2-721712933	S2	US	2		False	True	False	False	True	False	False	False	False	False	True	3	3	False	f938bfc2a72bd20a			1	absent_top80_weak_name
+S1-901295497	S3-219187014	S3	US	4		True	True	False	False	True	False	False	False	False	True	True	4	4	False	e46d729ebd178d14			1	absent_top80_target_address_missing
+S1-163094089	S2-125589272	S2	India	4	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	4	4	False	b2f7aee394685d69	57.0		1	multi_match_truncation
+S1-113633938	S3-524461507	S3	India	4	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	ff0a8624844780b0	21.0		1	multi_match_truncation
+S1-113633938	S3-8721590	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	4	14	False	893575d80ed585db			1	absent_top80_weak_name
+S1-838405902	S2-568193180	S2	US	4		False	True	False	False	True	False	False	False	False	False	True	2	2	False	93582111d4d07fbe			1	absent_top80_weak_name
+S1-484991727	S2-986653233	S2	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	2	False	b050065f3445483b		56.0	1	multi_match_truncation
+S1-883462168	S2-916453847	S2	US	1	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	27abbdc6e2011939		1.0	1	address_evidence_fusion_truncation
+S1-372530981	S3-27328992	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	2	False	6d94cf6557017df4		1.0	1	multi_match_truncation
+S1-128191007	S3-862600366	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	2	5	False	5f928c511e899938		24.0	1	multi_match_truncation
+S1-989956918	S3-2490656	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	5	False	cb2c4119b0b0c393		3.0	1	address_evidence_fusion_truncation
+S1-989956918	S3-277907963	S3	US	4	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	False	5	5	False	3a31ba9a3cc7a091	18.0	20.0	1	name_evidence_fusion_truncation
+S1-989956918	S3-436009324	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	3	False	c053edbc7dcb1f32		2.0	1	address_evidence_fusion_truncation
+S1-989956918	S3-971228238	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	6	False	682b430ad789a21d		4.0	1	address_evidence_fusion_truncation
+S1-807214364	S3-373804217	S3	US	2	name_char_tfidf	True	False	True	False	False	False	False	False	False	True	True	5	5	False	0af735d0f7fe91f6	29.0		1	multi_match_truncation
+S1-720493036	S2-520385408	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	True	2	4	False	1e45c8f7d78b11a5	58.0	2.0	1	multi_match_truncation
+S1-707615693	S3-491761332	S3	US	3		False	True	False	False	True	False	False	False	False	True	True	3	3	False	469528fcfd5e0104			1	absent_top80_weak_name
+S1-573391561	S3-491220995	S3	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	True	3	4	False	b80a04c72b2c09a7	65.0	3.0	1	multi_match_truncation
+S1-498214374	S3-490939047	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	4	False	2ef1bea3afdde6e3		35.0	1	multi_match_truncation
+S1-227915359	S3-590904346	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	4	False	e431ff013c4d35ca			1	absent_top80_weak_name
+S1-372715451	S2-853437500	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	b5a8d67527c463ff		4.0	1	address_evidence_fusion_truncation
+S1-372715451	S3-219968028	S3	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	False	2	3	False	ebb44b2313a65f99	60.0	1.0	1	name_evidence_fusion_truncation
+S1-372715451	S3-599325944	S3	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	False	2	3	False	43ea8aa801a2f9e8	64.0	2.0	1	name_evidence_fusion_truncation
+S1-347724275	S2-607202592	S2	US	3	name_char_tfidf	False	False	True	False	False	False	False	True	False	False	True	4	4	False	a133e4d40412532f	12.0		1	multi_match_truncation
+S1-332698105	S3-203492279	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	2	7	False	5379a80617723ab3			1	absent_top80_weak_name
+S1-735835504	S2-748776802	S2	US	3		True	True	False	False	True	True	False	True	False	False	False	1	2	False	ce49777e654c39e8			2	absent_top80_target_address_missing
+S1-735835504	S2-809190170	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	1	2	False	8a91690dc5605d5c		4.0	1	address_evidence_fusion_truncation
+S1-735835504	S2-903980249	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	1	1	False	e546e526d1ec96a4		6.0	1	address_evidence_fusion_truncation
+S1-556151356	S2-237103673	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	True	2	2	False	53d075833802e858	75.0	3.0	1	multi_match_truncation
+S1-556151356	S2-396863904	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	29e9a007a795c294		2.0	1	multi_match_truncation
+S1-68854443	S2-467930837	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	4	17	False	69a2f4230f6ea238			1	absent_top80_weak_name
+S1-910758236	S3-411809830	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	2	2	False	99f55ac5a0e410fe		20.0	1	multi_match_truncation
+S1-540376674	S2-180811175	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	dce4055289dc1986		73.0	1	multi_match_truncation
+S1-910537200	S2-276033397	S2	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	415a8116f67d0e71		7.0	1	multi_match_truncation
+S1-910537200	S3-987848720	S3	US	5	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	True	2	3	False	938bfc17974ccdf2	33.0	2.0	1	multi_match_truncation
+S1-408214515	S3-264504850	S3	US	6		False	True	False	False	True	False	False	False	False	True	True	3	2	False	69ed5378bd8449c1			1	absent_top80_weak_name
+S1-879353329	S3-255368129	S3	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	7	False	6f1bbc61e5ed0326	38.0		1	multi_match_truncation
+S1-699951824	S2-249535676	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	4	10	False	758df13c6a59a7e0			1	absent_top80_weak_name
+S1-375222449	S2-464321860	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	6	False	7b11f51a815c7fc0		18.0	1	multi_match_truncation
+S1-43764229	S3-1288846	S3	India	5	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	3	False	a61d01971663567a	12.0		1	multi_match_truncation
+S1-43764229	S3-787493094	S3	India	5	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	2	False	012dacbfed50dfcd	18.0		1	multi_match_truncation
+S1-974677569	S2-191667952	S2	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	False	True	4	2	False	465816ad60b3c637	13.0		1	multi_match_truncation
+S1-998851254	S3-413414521	S3	US	5	name_char_tfidf	False	False	True	False	False	False	False	False	False	True	True	4	2	False	5c6338059ad56f5a	12.0		1	multi_match_truncation
+S1-770100809	S3-56302693	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	6	False	bcde86fa9a0ff849			1	absent_top80_weak_name
+S1-862483991	S3-478325135	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	1b587a72729b9850		14.0	1	multi_match_truncation
+S1-201862851	S3-132306195	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	5	5	False	87404438152c09d5		28.0	1	multi_match_truncation
+S1-201862851	S3-457017970	S3	India	4		True	True	False	False	True	False	False	False	True	True	True	5	5	False	0bc31b645ba7e5a6			1	absent_top80_target_address_missing
+S1-335116476	S2-364268216	S2	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	3	3	False	f53382cc03d49f7a	29.0		1	multi_match_truncation
+S1-593943472	S2-604967844	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	10	False	73864d67dbddfe20		11.0	1	multi_match_truncation
+S1-310483682	S3-829909426	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	b4fe90b1e8380b78		19.0	1	multi_match_truncation
+S1-234884418	S2-683327788	S2	US	3		True	True	False	False	True	False	False	False	False	False	True	2	2	False	a97c436055c702e9			1	absent_top80_target_address_missing
+S1-255499299	S3-474753774	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	b31923244403e7f7		3.0	1	multi_match_truncation
+S1-255499299	S3-563655156	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	4	False	be0f2b2de0569eca		1.0	1	multi_match_truncation
+S1-712552094	S2-736100966	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	2	6	False	6ab4f7585ebb9091		22.0	1	multi_match_truncation
+S1-765706485	S3-483904950	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	1	False	24dd98854c8865f8		39.0	1	multi_match_truncation
+S1-833180441	S3-414719606	S3	India	1		False	True	False	False	True	False	False	False	True	True	False	3	12	False	bec32cd1966633bb			1	absent_top80_weak_name
+S1-445508448	S3-250024648	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	2	False	72f3f789bfbce7f9	67.0		1	multi_match_truncation
+S1-445508448	S3-698166729	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	3	7	False	74c7ca320e6e3c0c			1	absent_top80_weak_name
+S1-664968426	S2-760363361	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	d364677614077b6d		6.0	1	multi_match_truncation
+S1-664968426	S3-278315161	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	8adf3c9bd0303033		2.0	1	multi_match_truncation
+S1-337797913	S3-415735153	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	16	False	f72def20bc3b7c91			1	absent_top80_weak_name
+S1-337797913	S3-450106136	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	4	False	e9f57a6f3f151223			1	absent_top80_weak_name
+S1-337797913	S3-606713992	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	5	False	029716cc8de38303			1	absent_top80_weak_name
+S1-325638617	S3-524510366	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	4f2d112713b4f1c2		31.0	1	multi_match_truncation
+S1-325638617	S3-613296311	S3	US	4		False	True	False	False	True	False	False	False	False	True	True	3	3	False	69718e8171f04c20			1	absent_top80_weak_name
+S1-111832340	S2-570713805	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	e1d11048558864f1		2.0	1	multi_match_truncation
+S1-659749829	S3-721668681	S3	India	4		True	True	False	False	True	False	False	False	True	True	True	3	3	False	396416212f94c104			1	absent_top80_target_address_missing
+S1-749607521	S3-539006134	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	fd89d429ac493739		13.0	1	multi_match_truncation
+S1-400793494	S2-429860929	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	3	2	False	8eeabc68a1ac7586		2.0	1	address_evidence_fusion_truncation
+S1-400793494	S2-684434783	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	8	False	6c9260dd5ed01ecb		1.0	1	address_evidence_fusion_truncation
+S1-989795467	S2-476788203	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	5	False	9b6822ce26484b61		3.0	1	multi_match_truncation
+S1-989795467	S2-481020105	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	4	False	0ee5931f216ff9d8		1.0	1	multi_match_truncation
+S1-979296205	S2-114494408	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	16	False	a2b2b5f58a70a9bb		29.0	1	multi_match_truncation
+S1-536091235	S3-350421245	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	12	False	c5ea655d8ca6fdfa			1	absent_top80_weak_name
+S1-518564907	S2-609533026	S2	India	2		True	True	False	False	True	False	False	False	True	False	True	4	4	False	e5485fb57b06302d			1	absent_top80_target_address_missing
+S1-760115338	S3-606637021	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	38e0e6ef8e020e92		2.0	1	multi_match_truncation
+S1-760115338	S3-850557096	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	cfaa0062a8da40f5		1.0	1	multi_match_truncation
+S1-22818130	S3-303570018	S3	US	1		True	True	False	False	True	False	False	False	False	True	False	4	5	False	2c1f67b24a007956			1	absent_top80_target_address_missing
+S1-416430247	S3-569368734	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	False	4	4	False	5e92171df7af9044	34.0		1	name_evidence_fusion_truncation
+S1-416430247	S3-937356215	S3	India	3		False	True	False	False	True	False	False	False	True	True	False	4	16	False	f5b90e5c04172979			1	absent_top80_weak_name
+S1-416430247	S3-991284286	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	False	4	4	False	3f7df966ad4a622e	26.0		1	name_evidence_fusion_truncation
+S1-745632742	S3-209082045	S3	US	5	name_char_tfidf	False	False	True	False	False	False	False	True	False	True	True	3	2	False	ee783de0cb99aeb6	16.0		1	multi_match_truncation
+S1-649753693	S3-467000051	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	3	3	False	66237ef38eeb6bf3			1	absent_top80_weak_name
+S1-784069516	S3-609558255	S3	India	5	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	4	False	b256acb8902163f1	20.0		1	multi_match_truncation
+S1-355673736	S2-317586067	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	3	False	f65c69fcb7689f53		49.0	1	address_evidence_fusion_truncation
+S1-355673736	S2-898199968	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	3	False	ec336be4699e025a		13.0	1	address_evidence_fusion_truncation
+S1-416684414	S2-65824581	S2	India	3	address_char_tfidf	False	True	False	True	False	True	False	False	True	False	True	4	13	False	1297ec1403dacefa		65.0	2	multi_match_truncation
+S1-416684414	S2-722906838	S2	India	3	address_char_tfidf	False	True	False	True	False	True	False	False	True	False	True	4	13	False	165cc76effcdc777		66.0	2	multi_match_truncation
+S1-510323251	S2-593262637	S2	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	16	False	18781866a58e59ca		14.0	1	multi_match_truncation
+S1-890318975	S2-45597754	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	3	2	False	6336d14fa1ce0cfd		1.0	1	multi_match_truncation
+S1-188532243	S2-870630581	S2	India	7		True	True	False	False	True	False	False	False	True	False	True	3	3	False	4b844ad3256d9cd1			1	absent_top80_target_address_missing
+S1-340421839	S2-526619699	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	3	10	False	485e12248c8ba920			1	absent_top80_weak_name
+S1-340421839	S2-765182069	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	3	10	False	1209899cd67cce84		23.0	1	multi_match_truncation
+S1-279953032	S2-199202901	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	3	3	False	56bb892609a50b98		12.0	1	multi_match_truncation
+S1-575336756	S2-811345903	S2	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	4	5	False	f85ee9deef217e23	20.0		1	multi_match_truncation
+S1-558835639	S2-513491222	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	4	3	False	b6a7ce2121ea7ef8		1.0	1	multi_match_truncation
+S1-558835639	S2-532307285	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	4	False	0c3924b71bbf855d		2.0	1	multi_match_truncation
+S1-691567261	S3-23377833	S3	India	2		False	True	False	False	True	False	False	False	True	True	False	4	13	False	51d7dd5b76b9935a			1	absent_top80_weak_name
+S1-691567261	S3-717287667	S3	India	2		False	True	False	False	True	False	False	False	True	True	False	4	13	False	5fbb98e9d4bce388			1	absent_top80_weak_name
+S1-988397118	S3-766112268	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	4b85726cd6f9a493		2.0	1	multi_match_truncation
+S1-614877599	S2-193971447	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	1	2	False	daf0d6a082399209		2.0	1	multi_match_truncation
+S1-614877599	S3-703672360	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	1	2	False	4d4dcb8aa6406a16		1.0	1	multi_match_truncation
+S1-206838440	S2-875563641	S2	US	5		True	True	False	False	True	False	False	False	False	False	True	6	6	False	1a15748066182038			1	absent_top80_target_address_missing
+S1-672443795	S2-149744332	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	True	False	True	False	False	False	4	3	False	8f7eed12c32d4db2	63.0	2.0	2	name_evidence_fusion_truncation
+S1-672443795	S2-257072370	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	4	2	False	ff357b5306dc1edf		1.0	1	address_evidence_fusion_truncation
+S1-672443795	S2-722853810	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	True	False	True	False	False	False	4	3	False	8f7eed12c32d4db2	64.0	3.0	2	name_evidence_fusion_truncation
+S1-694783865	S3-192913277	S3	India	2		False	True	False	False	True	False	False	False	True	True	False	4	14	False	57ba2d711c01f3c8			1	absent_top80_weak_name
+S1-694783865	S3-635032157	S3	India	2		False	True	False	False	True	False	False	False	True	True	False	4	14	False	c044baf74170926a			1	absent_top80_weak_name
+S1-39426633	S3-307669033	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	3	False	b167b91331a56989		1.0	1	multi_match_truncation
+S1-844081402	S2-316428946	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	5	18	False	e5095c3335ce2ca8			1	absent_top80_weak_name
+S1-850322935	S2-771857155	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	3	False	73ce4b6840e815b7		27.0	1	multi_match_truncation
+S1-879439957	S2-405756575	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	4	False	e1dbda47cf4c8738			1	absent_top80_weak_name
+S1-879439957	S3-811694266	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	48e2e31eb85c2d3d		26.0	1	multi_match_truncation
+S1-690234734	S3-711947012	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	3	14	False	13f2e6c5a152880f		27.0	1	multi_match_truncation
+S1-506850758	S3-125080109	S3	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	4	False	91c30465234d92e3	24.0		1	multi_match_truncation
+S1-756473486	S3-73834392	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	3	False	f4ed7685c49a029a	19.0		1	multi_match_truncation
+S1-437131371	S3-745531478	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	2	False	6d5b1b4304fc9b1b		15.0	1	multi_match_truncation
+S1-103921530	S3-46412737	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	2	False	b5835ff6e1951681			1	absent_top80_weak_name
+S1-103921530	S3-565179378	S3	India	4	name_char_tfidf	True	False	True	False	False	False	False	True	True	True	True	2	3	False	f169ee805646af1d	15.0		1	multi_match_truncation
+S1-103921530	S3-898310905	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	4	False	dd2c9f2f0252cf18			1	absent_top80_weak_name
+S1-442650299	S3-948851395	S3	US	4		False	True	False	False	True	False	False	False	False	True	True	2	3	False	8539e4d3c38a406d			1	absent_top80_weak_name
+S1-67872677	S3-888195316	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	2	2	False	4ed82ec6398a25e8			1	absent_top80_weak_name
+S1-267457580	S3-180942323	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	5	False	e87e6c69eb6575a1			1	absent_top80_weak_name
+S1-267457580	S3-822299592	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	14	False	186aff37dc4542fa		34.0	1	multi_match_truncation
+S1-847785440	S2-699984736	S2	India	3		False	True	False	False	True	False	False	False	True	False	True	4	15	False	b8d4d0934e0fc928			1	absent_top80_weak_name
+S1-946595994	S3-926380714	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	2	False	e1f3741f1672a9ae			1	absent_top80_weak_name
+S1-456377382	S3-689207014	S3	India	2	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	5ef2f5506ed4d31e	11.0		1	multi_match_truncation
+S1-2919540	S2-47368033	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	6e9197ec90e9e13c		3.0	1	multi_match_truncation
+S1-2919540	S2-746528467	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	783dbc1bedef8fcf		4.0	1	multi_match_truncation
+S1-2919540	S2-97106626	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	3	False	b92709e9c7875279		1.0	1	multi_match_truncation
+S1-931535969	S3-248173818	S3	US	4	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	True	4	5	False	c87a4955c0434cc1	45.0	2.0	1	multi_match_truncation
+S1-931535969	S3-364263597	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	4	False	26277e39a5c51ab8		3.0	1	multi_match_truncation
+S1-931535969	S3-952721013	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	1	False	6cbc92e27bba3f38		4.0	1	multi_match_truncation
+S1-800862993	S3-829190221	S3	India	2		False	True	False	False	True	False	False	False	True	True	True	3	3	False	d71df8f925a7a517			1	absent_top80_weak_name
+S1-873374224	S3-605432363	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	3	9	False	29443f2526a5955e			1	absent_top80_weak_name
+S1-127978854	S3-75360247	S3	US	4	name_char_tfidf	False	False	True	False	False	False	False	True	False	True	True	3	2	False	89aa136df194bfc8	72.0		1	multi_match_truncation
+S1-336561225	S2-481852501	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	bcc1fba458749925		14.0	1	multi_match_truncation
+S1-527197329	S2-973142150	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	17	False	17044656b61c302f			1	absent_top80_weak_name
+S1-527197329	S3-483619890	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	2	False	89aeafc9633b2d96		79.0	1	multi_match_truncation
+S1-31128936	S2-565073793	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	4	False	78616e02384b0a52			1	absent_top80_weak_name
+S1-789155083	S2-807494841	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	17	False	da918fa4559f1c72		12.0	1	multi_match_truncation
+S1-789155083	S3-917717041	S3	India	5		True	True	False	False	True	False	False	False	True	True	True	4	4	False	5e63e7c4a9fed741			1	absent_top80_target_address_missing
+S1-418232413	S3-284730510	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	4	4	False	36422e215b4f18b3			1	absent_top80_weak_name
+S1-789658919	S3-779906982	S3	US	3	name_char_tfidf	True	False	True	False	False	False	False	False	False	True	True	3	2	False	8ba0cc64b7b753a9	17.0		1	multi_match_truncation
+S1-132514261	S2-133490265	S2	India	8		False	True	False	False	True	False	False	False	True	False	True	4	1	False	0d54a250af912c70			1	absent_top80_weak_name
+S1-132514261	S3-276084393	S3	India	8	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	f68de2ec95eee7fe		71.0	1	multi_match_truncation
+S1-132514261	S3-494733916	S3	India	8		False	True	False	False	True	False	False	False	True	True	True	4	1	False	6e25a3ad1b7eeec7			1	absent_top80_weak_name
+S1-132514261	S3-630511959	S3	India	8	address_char_tfidf	False	True	False	True	False	False	False	True	True	True	True	4	2	False	51f2f3455a343723		70.0	1	multi_match_truncation
+S1-132514261	S3-654139301	S3	India	8	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	27b77eb8bbbef3c6		72.0	1	multi_match_truncation
+S1-560862592	S2-156385590	S2	India	4		False	True	False	False	True	True	False	False	True	False	False	4	12	False	b339b66b6681f213			2	absent_top80_weak_name
+S1-560862592	S2-367868725	S2	India	4		False	True	False	False	True	False	False	False	True	False	False	4	12	False	68907d739fc91f01			1	absent_top80_weak_name
+S1-560862592	S2-618003225	S2	India	4		False	True	False	False	True	False	False	False	True	False	False	4	12	False	004f519ecbe528d1			1	absent_top80_weak_name
+S1-560862592	S2-930024918	S2	India	4		False	True	False	False	True	True	False	False	True	False	False	4	12	False	b339b66b6681f213			2	absent_top80_weak_name
+S1-707497230	S2-867437733	S2	India	1		False	True	False	False	True	False	False	False	True	False	False	2	6	False	a0ff5590a59cfd63			1	absent_top80_weak_name
+S1-470439807	S3-837361774	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	4	2	False	b323360a41214830			1	absent_top80_weak_name
+S1-317024901	S3-129916535	S3	US	3		False	True	False	False	True	False	False	False	False	True	True	4	2	False	4ce5c6c9031d7cfe			1	absent_top80_weak_name
+S1-272321793	S3-95803136	S3	India	6	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	9da2c963ad5633b1		29.0	1	multi_match_truncation
+S1-252662122	S2-403614260	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	True	3	4	False	a09a35e1150d9a33	22.0	1.0	1	multi_match_truncation
+S1-252662122	S2-47910231	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	True	3	3	False	9ec2588c97ea1902	10.0	2.0	1	multi_match_truncation
+S1-403621787	S3-865899114	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	5	14	False	36a91ee3c7f1f639			1	absent_top80_weak_name
+S1-519287302	S3-291421096	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	14	False	3fbff24265c45a5a		46.0	1	multi_match_truncation
+S1-519287302	S3-700104389	S3	India	4		True	True	False	False	True	False	False	False	True	True	True	4	4	False	cd3058a513252dc1			1	absent_top80_target_address_missing
+S1-70876498	S2-134668965	S2	India	3		True	True	False	False	True	False	False	False	True	False	True	3	3	False	d0fe4133634e2b7d			1	absent_top80_target_address_missing
+S1-745705033	S3-436361956	S3	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	True	2	4	False	4b74df5b6dd76a47	62.0	1.0	1	multi_match_truncation
+S1-340164660	S3-773179930	S3	India	4	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	3	3	False	b9abc959aa84f0f9	32.0		1	multi_match_truncation
+S1-340164660	S3-856437338	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	3	7	False	8d8cbc690057bc10			1	absent_top80_weak_name
+S1-419402833	S3-187302050	S3	India	3		True	True	False	False	True	False	False	False	True	True	True	3	3	False	940aa948dee94103			1	absent_top80_target_address_missing
+S1-39715715	S2-960227294	S2	US	4		False	True	False	False	True	False	False	False	False	False	True	4	2	False	b76916fdfcc0e877			1	absent_top80_weak_name
+S1-60392295	S2-753935848	S2	US	3		True	True	False	False	True	False	False	False	False	False	True	2	2	False	3b70143263b7ef52			1	absent_top80_target_address_missing
+S1-102365345	S3-816888488	S3	US	1	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	3	3	False	0e7b44738dbf4609		6.0	1	address_evidence_fusion_truncation
+S1-775628471	S3-178887732	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	2	False	231f04585a139bd1		38.0	1	multi_match_truncation
+S1-343045995	S2-169431521	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	16	False	26226d0439bb7e42		10.0	1	multi_match_truncation
+S1-343045995	S2-784084666	S2	India	5	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	4	3	False	2dd429826da2eb78	13.0		1	multi_match_truncation
+S1-343045995	S3-450338126	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	16	False	f7520dd85ddbf8b9		10.0	1	multi_match_truncation
+S1-917790057	S2-894240134	S2	India	4		True	True	False	False	True	False	False	False	True	False	True	3	3	False	cc331a19539a23e5			1	absent_top80_target_address_missing
+S1-917790057	S2-925905276	S2	India	4	name_char_tfidf	False	False	True	False	False	False	False	False	True	False	True	3	2	False	dfec7047b306382e	64.0		1	multi_match_truncation
+S1-941856895	S2-60169471	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	4	14	False	22baa5dff19ff2e0			1	absent_top80_weak_name
+S1-710316455	S2-371549286	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	4	False	e8cbd9aabd1faec7		46.0	1	multi_match_truncation
+S1-528099423	S2-436332083	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	13	False	8e39d671241b1f7c		35.0	1	multi_match_truncation
+S1-76442892	S2-554944141	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	4	False	14ce60bcb4eeb688		2.0	1	multi_match_truncation
+S1-40611215	S2-155508851	S2	India	3		True	True	False	False	True	False	False	False	True	False	True	3	3	False	4f0e30c6c3bc9f8b			1	absent_top80_target_address_missing
+S1-61477348	S3-193947693	S3	India	4	name_char_tfidf	False	False	True	False	False	False	False	True	True	True	True	4	4	False	091903523b39290c	10.0		1	multi_match_truncation
+S1-202989137	S3-419935656	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	2	3	False	85ff72fc5ca5ba12		11.0	1	multi_match_truncation
+S1-408825570	S3-866888464	S3	India	3		True	True	False	False	True	False	False	False	True	True	True	4	5	False	1a4ff14eb351de12			1	absent_top80_target_address_missing
+S1-690948239	S2-626733244	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	2	False	b667987bd08f5395		15.0	1	multi_match_truncation
+S1-129033585	S2-278346274	S2	India	3		False	True	False	False	True	False	False	False	True	False	False	4	11	False	2b27ef22d1ef36e7			1	absent_top80_weak_name
+S1-129033585	S2-911851881	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	False	4	4	False	b266acbba8858a48		12.0	1	address_evidence_fusion_truncation
+S1-129033585	S2-988277275	S2	India	3		False	True	False	False	True	False	False	False	True	False	False	4	11	False	be2f7e073147cdaf			1	absent_top80_weak_name
+S1-451110646	S3-960243008	S3	US	1		False	True	False	False	True	False	False	False	False	True	False	4	6	False	288cb879b9264c2a			1	absent_top80_weak_name
+S1-598784179	S3-348606000	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	835547c40f02e935		2.0	1	multi_match_truncation
+S1-598784179	S3-437382186	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	1	False	4ddc432fe1f9e0e3		1.0	1	multi_match_truncation
+S1-451595427	S2-480390761	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	3	False	c1abad0c8fe6d428		4.0	1	multi_match_truncation
+S1-838405277	S2-882607368	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	2	1	False	445be1e024c9fc96		1.0	1	multi_match_truncation
+S1-411886320	S2-714898146	S2	India	3		False	True	False	False	True	False	False	False	True	False	True	4	14	False	4d6c7b18c967cf33			1	absent_top80_weak_name
+S1-564279103	S2-767418806	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	3	False	58c95cd8b51740d1		19.0	1	multi_match_truncation
+S1-564279103	S2-787236455	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	3	3	False	a27076d33ff3d770		21.0	1	multi_match_truncation
+S1-588448198	S2-681512090	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	3	7	False	bf2b3270b51132a1		32.0	1	multi_match_truncation
+S1-28582164	S2-703399345	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	5	16	False	f6df53055e5160d3			1	absent_top80_weak_name
+S1-928440281	S2-920882034	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	4	16	False	8dec70b4766c6fe0			1	absent_top80_weak_name
+S1-709544484	S3-303830685	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	1b50c2475fe4cf78		1.0	1	multi_match_truncation
+S1-340242779	S3-660723850	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	4	4	False	3271d1433a435af9		1.0	1	multi_match_truncation
+S1-115142501	S2-999570679	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	1	False	9d36c55d52858220		21.0	1	multi_match_truncation
+S1-274195583	S3-467870179	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	3f97f26f3abd1c91		39.0	1	multi_match_truncation
+S1-274195583	S3-882215451	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	True	True	True	True	4	4	False	980a9a5d30a5d61e		40.0	1	multi_match_truncation
+S1-624076333	S3-389534445	S3	US	6		False	True	False	False	True	False	False	False	False	True	True	4	1	False	ef3c6ba8826ff926			1	absent_top80_weak_name
+S1-624076333	S3-741847581	S3	US	6	name_char_tfidf	True	False	True	False	False	False	False	False	False	True	True	4	2	False	18e4b89db4e2ec7b	69.0		1	multi_match_truncation
+S1-330569623	S2-485565020	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	3	2	False	10e9208b5b85015a		3.0	1	address_evidence_fusion_truncation
+S1-330569623	S2-552930776	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	False	3	2	False	fbb98d9d54122b18	75.0	2.0	1	name_evidence_fusion_truncation
+S1-330569623	S2-682772540	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	3	False	c0ac577a90488380		1.0	1	address_evidence_fusion_truncation
+S1-999074629	S3-946694497	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	5	2	False	d9ca90e3ebd83ff0		27.0	1	multi_match_truncation
+S1-683215128	S2-416155933	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	True	2	3	False	3e8c892b0ba1b0f3	61.0	1.0	1	multi_match_truncation
+S1-569524187	S3-108652643	S3	India	2	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	3	False	edded58dcf4cfb09	63.0		1	multi_match_truncation
+S1-516614693	S2-385886089	S2	US	5	name_char_tfidf	False	False	True	False	False	False	False	False	False	False	True	4	4	False	d456cc0f025e3048	66.0		1	multi_match_truncation
+S1-359436073	S2-202352205	S2	US	7	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	8a7988f93ebe3c60		22.0	1	multi_match_truncation
+S1-359436073	S2-388956851	S2	US	7	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	1	False	ea7331c3c0d059b0		21.0	1	multi_match_truncation
+S1-359436073	S3-737188782	S3	US	7		True	True	False	False	True	False	False	False	False	True	True	2	2	False	180f6e0b04ea5fb5			1	absent_top80_target_address_missing
+S1-887620234	S2-18301674	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	e3ecc1bc806a8946		10.0	1	multi_match_truncation
+S1-523245489	S3-246000785	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	5	False	43994f5035e7a29d			1	absent_top80_weak_name
+S1-768645812	S3-561403640	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	0a9eea26e3f3b7d1		2.0	1	multi_match_truncation
+S1-687369556	S3-739446917	S3	India	5	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	4	False	beb362fb7af00a94	31.0		1	multi_match_truncation
+S1-74332651	S2-43632015	S2	India	1		False	True	False	False	True	False	False	False	True	False	False	3	12	False	38945eade18cc0fd			1	absent_top80_weak_name
+S1-412493317	S3-695487224	S3	India	5		False	True	False	False	True	False	False	False	True	True	True	2	2	False	cc100b306d5f437e			1	absent_top80_weak_name
+S1-167948978	S2-138238432	S2	India	7	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	2	2	False	332c9a95097e99a6	25.0		1	multi_match_truncation
+S1-167948978	S2-743121033	S2	India	7	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	2	7	False	6f69ee81880b8a71		17.0	1	multi_match_truncation
+S1-167948978	S3-347644213	S3	India	7		False	True	False	False	True	False	False	False	True	True	True	2	7	False	a1fe1d72921b5f34			1	absent_top80_weak_name
+S1-826852877	S2-606715598	S2	US	1	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	3	False	5052e77c4f479224		1.0	1	address_evidence_fusion_truncation
+S1-813062794	S3-506471827	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	3	1	False	c7b8a43e6a52279b		22.0	1	multi_match_truncation
+S1-147650443	S2-833438498	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	14	False	cf1a69a1a9585353			1	absent_top80_weak_name
+S1-952570027	S3-356925020	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	284b29e5935d0d59		2.0	1	multi_match_truncation
+S1-952570027	S3-60668871	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	bcfe0721dc862957		1.0	1	multi_match_truncation
+S1-952570027	S3-695428626	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	3	False	d5febd2a417f31e3		4.0	1	multi_match_truncation
+S1-167718688	S3-514442031	S3	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	False	2	3	False	59d0a1a0b59cb12e	61.0	19.0	1	name_evidence_fusion_truncation
+S1-167718688	S3-574120847	S3	US	2	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	True	False	2	3	False	78cb912512feb595	39.0	6.0	1	name_evidence_fusion_truncation
+S1-870838846	S3-191502340	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	1	False	a1a41f83fad4f1e6		22.0	1	multi_match_truncation
+S1-959767828	S2-304178512	S2	US	3		False	True	False	False	True	False	False	False	False	False	True	2	2	False	d99460f4da2620e6			1	absent_top80_weak_name
+S1-959767828	S2-689146341	S2	US	3	name_char_tfidf	False	False	True	False	False	False	False	False	False	False	True	2	3	False	d747591b3a8baac9	80.0		1	multi_match_truncation
+S1-312817614	S3-846028382	S3	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	3	2	False	1dfdb21707bf13b7		50.0	1	multi_match_truncation
+S1-276094925	S2-761442312	S2	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	2	False	0fa84e163035d24c		48.0	1	multi_match_truncation
+S1-347788266	S3-471651618	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	True	3	2	False	aef2eb81ce7ccbae		1.0	1	multi_match_truncation
+S1-131475222	S2-198861353	S2	US	5	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	True	3	2	False	aa2a0b7839a2e3f3	47.0	2.0	1	multi_match_truncation
+S1-131475222	S3-356996755	S3	US	5		False	True	False	False	True	False	False	False	False	True	True	3	3	False	f01a038c8b42fa6f			1	absent_top80_weak_name
+S1-131475222	S3-615330491	S3	US	5		False	True	False	False	True	False	False	True	False	True	True	3	2	False	9dc2c22434f4d40c			1	absent_top80_weak_name
+S1-131475222	S3-903313935	S3	US	5	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	335f6b9101cc7b53		27.0	1	multi_match_truncation
+S1-148046241	S3-706159962	S3	US	2	name_char_tfidf	True	False	True	False	False	False	False	False	False	True	True	3	3	False	a370e80783c577f3	58.0		1	multi_match_truncation
+S1-607922284	S3-837925819	S3	India	4		True	True	False	False	True	False	False	False	True	True	True	4	4	False	d498095b87fff9a2			1	absent_top80_target_address_missing
+S1-309628837	S3-181312384	S3	India	2	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	4	4	False	8a205e1c87ce5b99	12.0		1	multi_match_truncation
+S1-35426756	S3-370843204	S3	India	1	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	False	4	2	False	d0724ee328247792	34.0		1	name_evidence_fusion_truncation
+S1-325957302	S3-689380078	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	True	2	3	False	0316dd4743519a3e		2.0	1	multi_match_truncation
+S1-325957302	S3-916305664	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	True	2	3	False	cdeb4f4237109092		3.0	1	multi_match_truncation
+S1-252386798	S3-428849552	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	2	False	7177b63d9212c939	42.0		1	multi_match_truncation
+S1-394214083	S3-725149785	S3	US	3	name_char_tfidf	False	False	True	False	False	False	False	False	False	True	True	2	2	False	b87dff9dc7e540aa	76.0		1	multi_match_truncation
+S1-491854786	S2-586681276	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	15	False	94ce1ed4ad697c5b		12.0	1	multi_match_truncation
+S1-491854786	S3-405789248	S3	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	15	False	0ad091c3ed853266		19.0	1	multi_match_truncation
+S1-385128326	S2-202659055	S2	US	3		True	True	False	False	True	False	False	False	False	False	True	5	5	False	576fedc0c4696e51			1	absent_top80_target_address_missing
+S1-531590369	S3-971402103	S3	India	1		False	True	False	False	True	False	False	False	True	True	False	3	3	False	ba7556fb5b39d763			1	absent_top80_weak_name
+S1-94311769	S3-594089198	S3	India	2		False	True	False	False	True	False	False	False	True	True	True	4	11	False	d87a419aa9a8fadb			1	absent_top80_weak_name
+S1-620059433	S3-230100297	S3	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	2	2	False	7222f52a2c9c211d		45.0	1	multi_match_truncation
+S1-771393336	S2-535069044	S2	India	6		False	True	False	False	True	False	False	False	True	False	True	3	3	False	c2eab6929c5f8a77			1	absent_top80_weak_name
+S1-771393336	S3-947282007	S3	India	6	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	2	False	524ed44ae52897e6	20.0		1	multi_match_truncation
+S1-679761384	S2-899264527	S2	India	3		False	True	False	False	True	False	False	False	True	False	True	4	15	False	aa4329928dad2ce2			1	absent_top80_weak_name
+S1-530141062	S2-675950696	S2	US	6		False	True	False	False	True	False	False	False	False	False	True	2	2	False	363b17dc123e6b70			1	absent_top80_weak_name
+S1-530141062	S3-799823211	S3	US	6	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	b58bb5aff92974c5		45.0	1	multi_match_truncation
+S1-946944773	S3-608997196	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	5	False	8fec891edd752e9d		10.0	1	address_evidence_fusion_truncation
+S1-946944773	S3-770411372	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	4	False	d378aa48f0e07a39		15.0	1	address_evidence_fusion_truncation
+S1-946944773	S3-995691365	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	5	3	False	daf567f050342be6		4.0	1	address_evidence_fusion_truncation
+S1-381525807	S2-991756549	S2	India	6		False	True	False	False	True	False	False	False	True	False	True	2	6	False	734ce539a1e41292			1	absent_top80_weak_name
+S1-381525807	S3-303231893	S3	India	6		False	True	False	False	True	False	False	True	True	True	True	2	3	False	9f073ccef747ae9e			1	absent_top80_weak_name
+S1-480659492	S2-742219647	S2	India	3	name_char_tfidf	True	False	True	False	False	False	False	False	True	False	True	4	2	False	10b3ee355a00b5d9	46.0		1	multi_match_truncation
+S1-478884824	S2-419029656	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	4	False	bcc3d93a097574ee			1	absent_top80_weak_name
+S1-404833261	S2-660921092	S2	US	3		True	True	False	False	True	False	False	False	False	False	True	3	3	False	454152d665411b87			1	absent_top80_target_address_missing
+S1-495546121	S3-369094955	S3	India	3	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	3	False	aa9d75908c99129f	26.0		1	multi_match_truncation
+S1-668781389	S3-584249736	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	1	False	d5e3b617600e0a65			1	absent_top80_weak_name
+S1-784462781	S2-338932088	S2	US	1	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	False	False	False	False	1	1	False	c6f81587c02e8920	68.0	1.0	1	name_evidence_fusion_truncation
+S1-235950570	S3-239821361	S3	India	6	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	4	False	61dc0ad4d9ce081d		32.0	1	multi_match_truncation
+S1-235950570	S3-574296399	S3	India	6	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	d22be780c2c7ddcb	12.0		1	multi_match_truncation
+S1-235950570	S3-576079943	S3	India	6	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	4e57512d991bee7a	15.0		1	multi_match_truncation
+S1-239998450	S2-603628967	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	3	2	False	c79f704dc629f9cf		1.0	1	address_evidence_fusion_truncation
+S1-239998450	S3-388415263	S3	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	3	2	False	9b4f31e547f8c74f		55.0	1	address_evidence_fusion_truncation
+S1-313213916	S3-209601206	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	3	3	False	9b5ca9a7d9bacf8a		20.0	1	multi_match_truncation
+S1-140607716	S2-304022014	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	3	False	b7916a2617c3b319		1.0	1	multi_match_truncation
+S1-769559579	S2-284512863	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	4	18	False	2d73c7560427242c			1	absent_top80_weak_name
+S1-72004180	S2-262998500	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	5	False	e8bd6392aedba483		1.0	1	address_evidence_fusion_truncation
+S1-72004180	S2-373184511	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	3	False	2fbc5184c6677b9b		70.0	1	address_evidence_fusion_truncation
+S1-72004180	S3-192380502	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	3	3	False	5dfd1fe3264b3531		3.0	1	address_evidence_fusion_truncation
+S1-72004180	S3-465903980	S3	US	4	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	False	3	2	False	d73227cf25e6373b	67.0	1.0	1	name_evidence_fusion_truncation
+S1-683394583	S3-246887942	S3	India	2	address_char_tfidf	False	True	False	True	False	False	False	False	True	True	True	4	2	False	4d3a9a849a60b610		19.0	1	multi_match_truncation
+S1-957296166	S2-666634282	S2	India	5		True	True	False	False	True	False	False	False	True	False	True	2	2	False	f862f35f1834f340			1	absent_top80_target_address_missing
+S1-957296166	S3-893546358	S3	India	5		True	True	False	False	True	False	False	False	True	True	True	2	2	False	7b63fa92d884cc8b			1	absent_top80_target_address_missing
+S1-938073521	S3-329945764	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	6cc40b411387ddb2		1.0	1	multi_match_truncation
+S1-938073521	S3-62401405	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	3	3	False	f9679c79c357fb5c		2.0	1	multi_match_truncation
+S1-938073521	S3-772332550	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	True	False	True	True	3	2	False	23f5fdb851d0bd68		3.0	1	multi_match_truncation
+S1-299772089	S2-198435691	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	False	3	4	False	f3e058c9e247ab1c	75.0	4.0	1	name_evidence_fusion_truncation
+S1-299772089	S2-223417150	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	4	False	8181777b6bd6fa6a		2.0	1	address_evidence_fusion_truncation
+S1-299772089	S2-9464662	S2	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	False	False	3	4	False	8b8dcdac4f8bd731	73.0	3.0	1	name_evidence_fusion_truncation
+S1-163062622	S3-415366731	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	3	3	False	a4923152069f4a5b			1	absent_top80_weak_name
+S1-163062622	S3-952241397	S3	India	4	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	3	False	d5cf67d0ca5af940	45.0		1	multi_match_truncation
+S1-163062622	S3-997667073	S3	India	4		True	True	False	False	True	False	False	False	True	True	True	3	3	False	8fe701990794ae36			1	absent_top80_target_address_missing
+S1-27325442	S3-520120846	S3	India	2	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	3	3	False	1b21729dba85a1a4	18.0		1	multi_match_truncation
+S1-788526007	S3-41425720	S3	India	2	name_char_tfidf	True	False	True	False	False	False	False	True	True	True	True	4	2	False	25a5584ee5c9750c	36.0		1	multi_match_truncation
+S1-817525393	S2-73440186	S2	US	2		True	True	False	False	True	False	False	False	False	False	True	3	3	False	bb8de75de4549e26			1	absent_top80_target_address_missing
+S1-697164549	S3-591224972	S3	India	3		False	True	False	False	True	False	False	True	True	True	True	4	4	False	c88693ca0436d033			1	absent_top80_weak_name
+S1-324758536	S2-616993741	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	3	False	de07479423ef2691		2.0	1	multi_match_truncation
+S1-851705409	S3-296489924	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	3	False	9d1a4b43fb4a4151			1	absent_top80_weak_name
+S1-851705409	S3-90906396	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	2	False	b7c55c3f1fd5a567			1	absent_top80_weak_name
+S1-975227822	S2-415644841	S2	India	4		False	True	False	False	True	False	False	False	True	False	True	3	3	False	ced0881326e0dcaf			1	absent_top80_weak_name
+S1-471194420	S3-677591340	S3	India	2	name_char_tfidf	False	False	True	False	False	False	False	False	True	True	True	4	4	False	da2597626078d52c	39.0		1	multi_match_truncation
+S1-130205406	S2-287227798	S2	India	4	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	11	False	0a1927e46cfe887f		46.0	1	multi_match_truncation
+S1-997974098	S2-189875039	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	3	False	9361382a18951c62		7.0	1	multi_match_truncation
+S1-997974098	S2-382628119	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	a339e8ad36fa1e83		3.0	1	multi_match_truncation
+S1-997974098	S2-461650214	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	2	3	False	e8c2b239d40b029c		11.0	1	multi_match_truncation
+S1-981223704	S2-609882086	S2	India	7	name_char_tfidf	False	False	True	False	False	False	False	False	True	False	True	2	4	False	8668097c059b307b	56.0		1	multi_match_truncation
+S1-981223704	S3-117557159	S3	India	7		False	True	False	False	True	False	False	False	True	True	True	2	6	False	1172092504fa23eb			1	absent_top80_weak_name
+S1-981223704	S3-593131712	S3	India	7		False	True	False	False	True	False	False	False	True	True	True	2	6	False	e1ab827d295f60cc			1	absent_top80_weak_name
+S1-895411060	S3-370667552	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	6f549c3c586020de		1.0	1	multi_match_truncation
+S1-895411060	S3-461555171	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	1bd97ccb74318f79		2.0	1	multi_match_truncation
+S1-796234533	S2-59501296	S2	US	4		True	True	False	False	True	False	False	False	False	False	True	4	4	False	04f959f39d5a63c7			1	absent_top80_target_address_missing
+S1-902531679	S2-859046865	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	3	1	False	993aecc9d508520c			1	absent_top80_weak_name
+S1-91803027	S3-390075166	S3	India	4		False	True	False	False	True	False	False	False	True	True	True	2	2	False	5295845c385106ed			1	absent_top80_weak_name
+S1-492323114	S3-49801899	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	5	16	False	093988d63e4fd68c			1	absent_top80_weak_name
+S1-439013722	S2-489820339	S2	India	5		False	True	False	False	True	False	False	False	True	False	True	4	15	False	e0a221d2677f4774			1	absent_top80_weak_name
+S1-439013722	S2-880608689	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	15	False	dcb94ee1b629e879		54.0	1	multi_match_truncation
+S1-981080618	S2-943871071	S2	US	2		True	True	False	False	True	False	False	False	False	False	True	2	3	False	eb6436eb270b222f			1	absent_top80_target_address_missing
+S1-616845291	S3-899110840	S3	India	4	name_char_tfidf	True	False	True	False	False	False	False	False	True	True	True	5	5	False	e5050c39bb7361a8	58.0		1	multi_match_truncation
+S1-283230847	S2-130963802	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	3	3	False	ff11bbbd30fb4d1a		49.0	1	multi_match_truncation
+S1-105939628	S2-9922672	S2	US	4		False	True	False	False	True	False	False	False	False	False	True	2	2	False	38c1c413e89c1c46			1	absent_top80_weak_name
+S1-105939628	S3-474816650	S3	US	4	name_char_tfidf	False	False	True	False	False	False	False	True	False	True	True	2	3	False	a79c40a10dd9d41b	63.0		1	multi_match_truncation
+S1-105939628	S3-622578045	S3	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	2	2	False	0ceca986f7dc731b		70.0	1	multi_match_truncation
+S1-754267035	S3-492583707	S3	US	3	address_char_tfidf|name_char_tfidf	False	False	True	True	False	False	False	True	False	True	False	2	3	False	fa38b7da2146bc2f	62.0	2.0	1	name_evidence_fusion_truncation
+S1-754267035	S3-545710793	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	2	False	d00d165e652699ad		3.0	1	address_evidence_fusion_truncation
+S1-754267035	S3-639501877	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	2	3	False	40c2cf0b4b712de7		1.0	1	address_evidence_fusion_truncation
+S1-833645708	S2-970222306	S2	India	3	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	5	False	60e7c183a9e377f8		12.0	1	multi_match_truncation
+S1-424388119	S3-243528269	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	4	False	a83dbc8d1ad3b953			1	absent_top80_weak_name
+S1-424388119	S3-456029273	S3	India	3		False	True	False	False	True	False	False	False	True	True	True	4	16	False	21f9243f9f5202ac			1	absent_top80_weak_name
+S1-369554726	S3-86666858	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	True	5	5	False	a67bc17b62943768		2.0	1	multi_match_truncation
+S1-434587239	S2-701994992	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	4	2	False	fc5064cb9ed141df		3.0	1	multi_match_truncation
+S1-434587239	S2-876617395	S2	US	4	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	True	4	3	False	f28f0043418437b9		2.0	1	multi_match_truncation
+S1-216857464	S2-651117073	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	3	3	False	193a0b79d09a336f		2.0	1	address_evidence_fusion_truncation
+S1-216857464	S3-272995662	S3	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	True	False	3	3	False	fbad5b9c7f61a0ea		2.0	1	address_evidence_fusion_truncation
+S1-216857464	S3-309240667	S3	US	3		True	True	False	False	True	True	False	False	False	True	False	3	3	False	5524e80a26026a1e			2	absent_top80_target_address_missing
+S1-340051699	S2-389858820	S2	US	3	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	True	2	2	False	92a2c9742a287126		1.0	1	multi_match_truncation
+S1-473099715	S2-183690436	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	False	False	False	False	2	2	False	2998faef80b1b60d		2.0	1	address_evidence_fusion_truncation
+S1-473099715	S2-731719833	S2	US	2	address_char_tfidf	False	True	False	True	False	False	False	True	False	False	False	2	3	False	4f45f83255ed7e32		1.0	1	address_evidence_fusion_truncation
+S1-740823547	S2-994257418	S2	India	5	address_char_tfidf	False	True	False	True	False	False	False	False	True	False	True	4	4	False	0f8a1ec53b908a7e		24.0	1	multi_match_truncation
+S1-732771882	S2-458761296	S2	India	2		False	True	False	False	True	False	False	False	True	False	True	3	7	False	a17300c81666665f			1	absent_top80_weak_name

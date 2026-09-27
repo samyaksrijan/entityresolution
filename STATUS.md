@@ -17,7 +17,11 @@
 
 ## Next milestone
 
-Improve candidate recall before pair-model training, focusing on India, S3-only truth, and true
-targets with missing addresses. Evaluate additional bounded, business-text-only retrieval views
-(for example token/phonetic or field-aware fallbacks), then rerun the fixed sample and select the
-smallest union that clears the candidate recall and oracle thresholds.
+Candidate fusion v2 is implemented and leakage-safe, but the selected global-40 RRF rule reaches
+only 91.361% held-out edge recall and 0.95751 oracle macro F0.5 at 43.78 mean and 64 p95
+candidates. The exact decision is `IMPROVE_RETRIEVAL`; CatBoost training has not started.
+
+Run one bounded name-character rescue index restricted to targets whose address is missing,
+then measure its marginal held-out recall per added candidate. If it materially improves the 34
+absent-channel/missing-address misses, rerun selection and use the already-created disjoint
+uniform content-hash sample for unbiased final validation. Do not claim France accuracy.
