@@ -288,3 +288,81 @@ def hashlib_key(*values: object) -> str:
 
     payload = "\x1f".join(str(value) for value in values).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()[:16]
+
+
+TAXONOMY = (
+    "missing_or_null_name",
+    "missing_address",
+    "both_fields_sparse",
+    "accent_unicode",
+    "legal_suffix",
+    "token_reorder",
+    "token_segmentation",
+    "abbreviation_initials",
+    "typographical_corruption",
+    "digit_address_conflict",
+    "cross_language_like",
+    "fusion_truncation",
+    "absent_every_channel",
+    "other_unknown",
+)
+
+
+def classify_variations(
+    query: dict[str, Any], target: dict[str, Any], *, present: bool
+) -> dict[str, bool]:
+    """Deterministic diagnostic heuristics, never candidate gates or training labels.
+
+    Cross-language-like is a script mismatch flag, not a claim of translation.
+    Unknown categories remain explicit rather than treating weak retrieval as a typo.
+    """
+    import unicodedata
+
+    from rapidfuzz.fuzz import ratio
+
+    qn, tn = normalize_field(query["name"]), normalize_field(target["name"])
+    qa, ta = normalize_field(query["address"]), normalize_field(target["address"])
+    qv, tv = (
+        comparison_views(query["name"], is_name=True),
+        comparison_views(target["name"], is_name=True),
+    )
+    different = bool(
+        qn.unicode_preserving
+        and tn.unicode_preserving
+        and qn.unicode_preserving != tn.unicode_preserving
+    )
+
+    def initials(tokens):
+        return "".join(t[0] for t in tokens if t)
+
+    def scripts(text):
+        return {unicodedata.name(c, "UNKNOWN").split()[0] for c in text if c.isalpha()}
+
+    result = {
+        "missing_or_null_name": not qn.unicode_preserving or not tn.unicode_preserving,
+        "missing_address": not qa.unicode_preserving or not ta.unicode_preserving,
+        "both_fields_sparse": (len(qn.unicode_preserving) < 3 and len(qa.unicode_preserving) < 5)
+        or (len(tn.unicode_preserving) < 3 and len(ta.unicode_preserving) < 5),
+        "accent_unicode": different and qn.accent_folded == tn.accent_folded,
+        "legal_suffix": different
+        and bool(qv.legal_suffix_stripped)
+        and qv.legal_suffix_stripped == tv.legal_suffix_stripped,
+        "token_reorder": different and sorted(qn.tokens) == sorted(tn.tokens),
+        "token_segmentation": different and qn.compact_alphanumeric == tn.compact_alphanumeric,
+        "abbreviation_initials": different
+        and (
+            (len(qn.tokens) > 1 and initials(qn.tokens) == tn.compact_alphanumeric)
+            or (len(tn.tokens) > 1 and initials(tn.tokens) == qn.compact_alphanumeric)
+        ),
+        "typographical_corruption": different
+        and 70 <= ratio(qn.accent_folded, tn.accent_folded) < 100,
+        "digit_address_conflict": bool(qa.digit_tokens and ta.digit_tokens)
+        and qa.digit_tokens != ta.digit_tokens,
+        "cross_language_like": different
+        and bool(scripts(qn.unicode_preserving))
+        and scripts(qn.unicode_preserving).isdisjoint(scripts(tn.unicode_preserving)),
+        "fusion_truncation": present,
+        "absent_every_channel": not present,
+    }
+    result["other_unknown"] = not any(result[k] for k in TAXONOMY[:11])
+    return {key: bool(value) for key, value in result.items()}

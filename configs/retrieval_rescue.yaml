@@ -1,0 +1,47 @@
+# One prespecified mechanism, evaluated only after fusion/budget variants.
+run_id: retrieval_rescue_v1
+data_paths_config: configs/data_paths.yaml
+v2_config: configs/candidate_generation_v2.yaml
+aggregate: artifacts/blocking_v2/aggregated_evidence.parquet
+folds: artifacts/blocking_v2/folds.parquet
+cache: artifacts/retrieval_rescue
+output: artifacts/retrieval_rescue/evaluation.json
+query_batch_size: 250
+threads: 4
+rescue:
+  enabled: false
+  top_k: 20
+  threshold: 0.20
+  # Same name char_wb 3–5, min_df=2 fitted vocabulary as baseline; no redundant view.
+  gate: weak_query
+policies:
+  fixed_k20: {top_k: 20, rrf_k: 60}
+  fixed_k40: {top_k: 40, rrf_k: 60}
+  source_k40:
+    top_k: 40
+    rrf_k: 60
+    source_quotas: {S2: 20, S3: 20}
+  weighted_source_k40:
+    top_k: 40
+    rrf_k: 60
+    source_quotas: {S2: 20, S3: 20}
+    channel_weights: {"S3:name_char_tfidf": 1.15, "S3:address_char_tfidf": 0.9}
+  channel_k40:
+    top_k: 40
+    rrf_k: 60
+    channel_quotas: {name_char_tfidf: 10, address_char_tfidf: 10}
+  fixed_k80: {top_k: 80, rrf_k: 60}
+  stretch_adaptive:
+    top_k: 40
+    expanded_k: 320
+    adaptive: true
+    rrf_k: 60
+    source_quotas: {S2: 20, S3: 20}
+# Prespecified follow-up budgets are derived from the remaining missing-owner ranks.
+# Candidate volume is reported as a resource cost, never used as a score ceiling.
+score_experiment:
+  missing_address_budgets: [80, 512, 2048]
+  missing_address_threshold: 0.18
+  full_name_budgets: [160, 512, 1024]
+  full_address_budget: 512
+  machine_ram_gb: 128

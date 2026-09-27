@@ -1,0 +1,69 @@
+# K is a total per-query budget; exact matches and indistinguishable boundary ties survive.
+# Parser/query batches and matrix blocks are bounded independently of corpus size.
+runtime:
+  # Four small fitted v1 assets; no labels are stored or read. Set null to fit afresh.
+  vectorizer_root: artifacts/blocking
+  batch_size: 1000
+  shard_size: 1000
+  threads: 4
+  index_block_size: 20000
+  fit_sample_size: 75000
+  max_evidence_rows: 2000000
+  sparse:
+    ngram_min: 3
+    ngram_max: 5
+    min_df: 2
+    max_features: 50000
+    threshold: 0.20
+    top_k: 80
+profiles:
+  fast_submission:
+    # K is nominal: every exact name/address candidate survives.
+    top_k: 40
+    rrf_k: 60
+    preserve_channel_union: true
+  safe_k40:
+    top_k: 40
+    rrf_k: 60
+  emergency_k20:
+    top_k: 20
+    rrf_k: 60
+  stretch_adaptive:
+    top_k: 40
+    expanded_k: 400
+    adaptive: true
+    rrf_k: 60
+    source_quotas: {S2: 20, S3: 20}
+  competitive_adaptive:
+    top_k: 80
+    expanded_k: 512
+    adaptive: true
+    preserve_channel_union: true
+    rrf_k: 60
+    source_quotas: {S2: 40, S3: 40}
+  max_score:
+    # Preserve every channel's evidence; budgets do not truncate this union.
+    top_k: 80
+    expanded_k: 8192
+    adaptive: true
+    preserve_channel_union: true
+    rrf_k: 60
+    source_quotas: {S2: 40, S3: 40}
+    channel_weights:
+      "S2:name_char_tfidf": 1.0
+      "S3:name_char_tfidf": 1.0
+      "S2:address_char_tfidf": 1.0
+      "S3:address_char_tfidf": 1.0
+profile_rescue:
+  competitive_adaptive: {enabled: true, top_k: 80, threshold: 0.20, gate: weak_query}
+  max_score: {enabled: true, top_k: 2048, threshold: 0.18, gate: weak_query}
+profile_runtime:
+  fast_submission:
+    retrieval_backend: exact_only
+    vectorizer_root: null
+    batch_size: 10000
+    shard_size: 1000
+  max_score:
+    batch_size: 500
+    shard_size: 250
+    memory_cache_mb: 32768
