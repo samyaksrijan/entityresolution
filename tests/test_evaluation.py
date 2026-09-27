@@ -292,3 +292,21 @@ def test_decoder_ownership_margin():
     # 4. Result remains identical after shuffling the input candidate rows.
     res_shuffled = dec.decode(candidates.sample(frac=1, random_state=42), all_s1)
     assert res == res_shuffled
+
+    # Binary-exact equality
+    dec_exact = Decoder(enforce_target_ownership=True, score_margin=0.25)
+    cand_exact = pd.DataFrame([
+        {"s1_id": "S1-1", "target_id": "S2-4", "target_source": "S2", "score": 0.75},
+        {"s1_id": "S1-2", "target_id": "S2-4", "target_source": "S2", "score": 0.50},
+    ])
+    res_exact = dec_exact.decode(cand_exact, all_s1)
+    assert "S2-4" in res_exact["S1-1"]
+
+    # Decimal floating-point equality
+    dec_dec = Decoder(enforce_target_ownership=True, score_margin=0.20)
+    cand_dec = pd.DataFrame([
+        {"s1_id": "S1-1", "target_id": "S2-5", "target_source": "S2", "score": 0.70},
+        {"s1_id": "S1-2", "target_id": "S2-5", "target_source": "S2", "score": 0.50},
+    ])
+    res_dec = dec_dec.decode(cand_dec, all_s1)
+    assert "S2-5" in res_dec["S1-1"]

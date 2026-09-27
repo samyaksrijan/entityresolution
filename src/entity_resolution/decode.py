@@ -101,7 +101,17 @@ class Decoder:
                     .reindex(best.index)
                 )
 
-                margin_ok = second.isna() | (best - second).ge(self.score_margin)
+                gap = best - second
+                margin_ok = (
+                    second.isna()
+                    | gap.ge(self.score_margin)
+                    | np.isclose(
+                        gap,
+                        self.score_margin,
+                        rtol=1e-12,
+                        atol=1e-12,
+                    )
+                )
 
                 df_best = df[df["_owner_rank"] == 0].copy()
                 valid_targets = margin_ok[margin_ok].index
