@@ -1,6 +1,7 @@
 """Disk-cached, label-free train/test retrieval with validated atomic shards.
 
-Example: python -m entity_resolution.production_candidates --mode test --profile safe_k40
+Deadline fallback: --mode test --profile fast_submission (also exports to output/<run_id>).
+Sparse example: --mode test --profile safe_k40
 Resume: repeat that command with --resume (same run ID and configuration).
 """
 
@@ -14,8 +15,9 @@ import os
 import sqlite3
 import subprocess
 import time
-from collections import Counter
+from collections import Counter, OrderedDict
 from datetime import UTC, datetime
+from itertools import groupby, islice
 from pathlib import Path
 from typing import Any
 
@@ -169,6 +171,181 @@ def volume_statistics(counts: Counter[int]) -> dict[str, float | int]:
     }
 
 
+def _build_record_database(database, paths, mode, config, *, exact_only=False):
+    """Build the shared validated ID registry; fast mode indexes only Unicode exact keys."""
+    temporary = database.with_suffix(".sqlite.tmp")
+    temporary.unlink(missing_ok=True)
+    with sqlite3.connect(temporary) as db:
+        db.execute("PRAGMA cache_size=-32768")
+        db.execute("PRAGMA temp_store=FILE")
+        db.execute(
+            "CREATE TABLE records (id TEXT PRIMARY KEY, source TEXT, country TEXT, "
+            "name TEXT, address TEXT, folded_name TEXT, folded_address TEXT, tie TEXT)"
+        )
+        for source in ("S1", "S2", "S3"):
+            for frame in read_batches(paths[f"{mode}_source{source[-1]}"], config["batch_size"]):
+                _validate_source(frame, source)
+                rows = []
+                for row in frame.itertuples(index=False):
+                    n, a = (
+                        normalize_field(row.business_name),
+                        normalize_field(row.business_address),
+                    )
+                    rows.append(
+                        (
+                            row.entity_id,
+                            source,
+                            row.country,
+                            n.unicode_preserving,
+                            a.unicode_preserving,
+                            "" if exact_only else n.accent_folded,
+                            "" if exact_only else a.accent_folded,
+                            ""
+                            if exact_only
+                            else content_tie_key(
+                                row.business_name, row.business_address, row.country
+                            ),
+                        )
+                    )
+                try:
+                    db.executemany("INSERT INTO records VALUES (?,?,?,?,?,?,?,?)", rows)
+                except sqlite3.IntegrityError as exc:
+                    raise ValueError("duplicate source identifier across batches") from exc
+                db.commit()
+        fields = (
+            ("name", "address")
+            if exact_only
+            else ("name", "address", "folded_name", "folded_address")
+        )
+        for field in fields:
+            db.execute(f"CREATE INDEX idx_{field} ON records(source,country,{field},tie)")
+        if not exact_only:
+            db.execute("CREATE INDEX idx_order ON records(source,country,tie)")
+    os.replace(temporary, database)
+
+
+def _exact_rows(database, queries, run_id, maximum, *, exact_only=False):
+    """Shared exact semantics; never form missing/null-like keys."""
+    if queries.empty:
+        return []
+    output = []
+    with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as db:
+        for query in queries.itertuples(index=False):
+            for source in ("S2", "S3"):
+                for field in ("name", "address"):
+                    value = getattr(query, "business_" + field)
+                    for view, column in (
+                        ("unicode_preserving", field),
+                        ("accent_folded", "folded_" + field),
+                    ):
+                        if exact_only and view == "accent_folded":
+                            continue
+                        key, missing, null_like = normalized_key(value, view)
+                        if missing or null_like or not key:
+                            continue
+                        cursor = db.execute(
+                            f"SELECT id,tie FROM records WHERE source=? "
+                            f"AND country=? AND {column}=? ORDER BY tie,rowid",
+                            (source, query.country, key),
+                        )
+                        for target, tie in cursor:
+                            output.append(
+                                (
+                                    query.entity_id,
+                                    target,
+                                    source,
+                                    f"exact_{field}_{view}",
+                                    1.0,
+                                    1,
+                                    True,
+                                    run_id,
+                                    tie,
+                                )
+                            )
+                            if len(output) > maximum:
+                                raise MemoryError("exact evidence cap exceeded; reduce shard size")
+    return output
+
+
+class ExactOnlyRetriever:
+    """Linear TSV/SQLite preparation and indexed exact probes; no sparse dependency."""
+
+    def __init__(self, root: Path, config: dict[str, Any]):
+        self.root, self.config = root, config
+        self.database = root / "records.sqlite"
+        self.manifest = root / "index.json"
+
+    def build(self, paths, mode: str, fingerprints: dict[str, str]) -> None:
+        identity = {
+            "inputs": fingerprints,
+            "config": configuration_hash(self.config),
+            "schema_version": SCHEMA_VERSION,
+            "backend": "exact_only",
+        }
+        if self.manifest.exists():
+            state = json.loads(self.manifest.read_text())
+            if state["identity"] != identity:
+                raise ValueError("incompatible exact index manifest")
+            if _sha256(self.database) != state["files"][self.database.name]:
+                raise ValueError("corrupt exact index")
+            return
+        self.root.mkdir(parents=True, exist_ok=True)
+        _build_record_database(self.database, paths, mode, self.config, exact_only=True)
+        _atomic_json(
+            self.manifest,
+            {
+                "identity": identity,
+                "files": {self.database.name: _sha256(self.database)},
+                "blocks": [],
+            },
+        )
+
+    def retrieve(self, queries: pd.DataFrame, run_id: str) -> pd.DataFrame:
+        return pd.DataFrame(
+            _exact_rows(
+                self.database,
+                queries,
+                run_id,
+                self.config["max_evidence_rows"],
+                exact_only=True,
+            ),
+            columns=EVIDENCE_COLUMNS,
+        )
+
+
+def _fuse_exact(evidence, queries, policy, run_id):
+    """All exact pairs survive; skip per-query fuzzy quality gates and budget sorting."""
+    observations = {}
+    for row in evidence.itertuples(index=False):
+        if not row.exact_match or not row.channel.startswith("exact_"):
+            raise ValueError("non-exact evidence in exact-only backend")
+        observations.setdefault((row.s1_id, row.target_source, row.target_id), set()).add(
+            row.channel
+        )
+    output = []
+    for (query, source, target), channels in sorted(observations.items()):
+        support = [{"channel": c, "score": 1.0, "rank": 1, "exact": True} for c in sorted(channels)]
+        output.append(
+            (
+                query,
+                target,
+                source,
+                support[0]["channel"],
+                1.0,
+                1,
+                True,
+                run_id,
+                json.dumps(support, separators=(",", ":")),
+                len(channels) / (float(policy.get("rrf_k", 60)) + 1),
+            )
+        )
+    return pd.DataFrame(output, columns=SCHEMA.names), {
+        "adaptive_queries": 0,
+        "queries": len(queries),
+        "exact_only": True,
+    }
+
+
 class CachedRetriever:
     """SQLite exact lookups plus reusable float32 sparse target blocks on disk.
 
@@ -180,6 +357,30 @@ class CachedRetriever:
         self.root, self.config = root, config
         self.database = root / "records.sqlite"
         self.manifest = root / "index.json"
+        self._cache_limit = int(config.get("memory_cache_mb", 0)) * 2**20
+        self._block_cache: OrderedDict[str, tuple[Any, pd.DataFrame, int]] = OrderedDict()
+        self._cached_bytes = 0
+
+    def _load_block(self, block: dict[str, Any], field: str):
+        """Optional byte-bounded LRU; immutable matrices can stay warm on the cloud CPU."""
+        key = block[field]
+        if key in self._block_cache:
+            self._block_cache.move_to_end(key)
+            matrix, metadata, _ = self._block_cache[key]
+            return matrix, metadata
+        matrix = sparse.load_npz(self.root / key)
+        metadata = pd.read_parquet(self.root / block["metadata"])
+        if not self._cache_limit:
+            return matrix, metadata
+        size = sum(array.nbytes for array in (matrix.data, matrix.indices, matrix.indptr))
+        size += int(metadata.memory_usage(index=True, deep=True).sum())
+        if size <= self._cache_limit:
+            while self._cached_bytes + size > self._cache_limit:
+                _, (_, _, evicted) = self._block_cache.popitem(last=False)
+                self._cached_bytes -= evicted
+            self._block_cache[key] = (matrix, metadata, size)
+            self._cached_bytes += size
+        return matrix, metadata
 
     def build(self, paths, mode: str, fingerprints: dict[str, str]) -> None:
         identity = {
@@ -197,49 +398,7 @@ class CachedRetriever:
             return
         self.root.mkdir(parents=True, exist_ok=True)
         # An index interrupted before its commit marker is rebuilt, never trusted.
-        temporary = self.database.with_suffix(".sqlite.tmp")
-        temporary.unlink(missing_ok=True)
-        with sqlite3.connect(temporary) as db:
-            db.execute("PRAGMA cache_size=-32768")
-            db.execute("PRAGMA temp_store=FILE")
-            db.execute(
-                "CREATE TABLE records (id TEXT PRIMARY KEY, source TEXT, country TEXT, "
-                "name TEXT, address TEXT, folded_name TEXT, folded_address TEXT, tie TEXT)"
-            )
-            for source in ("S1", "S2", "S3"):
-                for frame in read_batches(
-                    paths[f"{mode}_source{source[-1]}"], self.config["batch_size"]
-                ):
-                    _validate_source(frame, source)
-                    rows = []
-                    for row in frame.itertuples(index=False):
-                        n, a = (
-                            normalize_field(row.business_name),
-                            normalize_field(row.business_address),
-                        )
-                        rows.append(
-                            (
-                                row.entity_id,
-                                source,
-                                row.country,
-                                n.unicode_preserving,
-                                a.unicode_preserving,
-                                n.accent_folded,
-                                a.accent_folded,
-                                content_tie_key(
-                                    row.business_name, row.business_address, row.country
-                                ),
-                            )
-                        )
-                    try:
-                        db.executemany("INSERT INTO records VALUES (?,?,?,?,?,?,?,?)", rows)
-                    except sqlite3.IntegrityError as exc:
-                        raise ValueError("duplicate source identifier across batches") from exc
-                    db.commit()
-            for field in ("name", "address", "folded_name", "folded_address"):
-                db.execute(f"CREATE INDEX idx_{field} ON records(source,country,{field},tie)")
-            db.execute("CREATE INDEX idx_order ON records(source,country,tie)")
-        os.replace(temporary, self.database)
+        _build_record_database(self.database, paths, mode, self.config)
         files, blocks = {}, []
         with sqlite3.connect(self.database) as db:
             for source in ("S2", "S3"):
@@ -325,43 +484,8 @@ class CachedRetriever:
     def retrieve(self, queries: pd.DataFrame, run_id: str) -> pd.DataFrame:
         if queries.empty:
             return pd.DataFrame(columns=EVIDENCE_COLUMNS)
-        output = []
         maximum = int(self.config["max_evidence_rows"])
-        with sqlite3.connect(f"file:{self.database}?mode=ro", uri=True) as db:
-            for query in queries.itertuples(index=False):
-                for source in ("S2", "S3"):
-                    for field in ("name", "address"):
-                        value = getattr(query, "business_" + field)
-                        for view, column in (
-                            ("unicode_preserving", field),
-                            ("accent_folded", "folded_" + field),
-                        ):
-                            key, missing, null_like = normalized_key(value, view)
-                            if missing or null_like or not key:
-                                continue
-                            cursor = db.execute(
-                                f"SELECT id,tie FROM records WHERE source=? "
-                                f"AND country=? AND {column}=? ORDER BY tie,rowid",
-                                (source, query.country, key),
-                            )
-                            for target, tie in cursor:
-                                output.append(
-                                    (
-                                        query.entity_id,
-                                        target,
-                                        source,
-                                        f"exact_{field}_{view}",
-                                        1.0,
-                                        1,
-                                        True,
-                                        run_id,
-                                        tie,
-                                    )
-                                )
-                                if len(output) > maximum:
-                                    raise MemoryError(
-                                        "exact evidence cap exceeded; reduce shard size"
-                                    )
+        output = _exact_rows(self.database, queries, run_id, maximum)
         output.extend(self.sparse_rows(queries, run_id))
         if len(output) > maximum:
             raise MemoryError("evidence cap exceeded; reduce shard size")
@@ -381,10 +505,10 @@ class CachedRetriever:
         state = json.loads(self.manifest.read_text())
         maximum = int(self.config["max_evidence_rows"])
         output = []
-        k = top_k or int(self.config["sparse"]["top_k"])
         threshold = self.config["sparse"]["threshold"] if threshold is None else threshold
         for source in ("S2", "S3"):
             for field in ("name",) if missing_address_only else ("name", "address"):
+                k = top_k or int(self.config.get(f"{field}_top_k", self.config["sparse"]["top_k"]))
                 vectorizer = joblib.load(self.root / f"{source}_{field}.joblib")
                 if vectorizer is None:
                     continue
@@ -402,8 +526,7 @@ class CachedRetriever:
                             or field not in block
                         ):
                             continue
-                        matrix = sparse.load_npz(self.root / block[field])
-                        metadata = pd.read_parquet(self.root / block["metadata"])
+                        matrix, metadata = self._load_block(block, field)
                         if missing_address_only:
                             mask = metadata["address_missing"].to_numpy(dtype=bool)
                             matrix, metadata = matrix[mask], metadata.loc[mask]
@@ -497,9 +620,18 @@ def generate(
         "policy",
         "rescue",
         "vectorizer_root",
+        "name_top_k",
+        "address_top_k",
+        "memory_cache_mb",
+        "retrieval_backend",
     }
     if set(config) - allowed:
         raise ValueError("unknown configuration keys (labels are not accepted)")
+    if (
+        not isinstance(config.get("memory_cache_mb", 0), int)
+        or config.get("memory_cache_mb", 0) < 0
+    ):
+        raise ValueError("memory_cache_mb must be a nonnegative integer")
     for key in (
         "batch_size",
         "shard_size",
@@ -512,11 +644,16 @@ def generate(
             raise ValueError(f"{key} must be a positive integer")
     if not 0 < config["sparse"]["top_k"] <= 32767:
         raise ValueError("sparse top_k must fit int16")
+    for field in ("name", "address"):
+        value = config.get(f"{field}_top_k", config["sparse"]["top_k"])
+        if not isinstance(value, int) or not 0 < value <= 32767:
+            raise ValueError("field top_k must fit int16")
     if config["shard_size"] > config["batch_size"]:
         raise ValueError("shard_size may not exceed batch_size")
     permitted = {
         "sparse": {"ngram_min", "ngram_max", "min_df", "max_features", "threshold", "top_k"},
         "policy": {
+            "preserve_channel_union",
             "top_k",
             "expanded_k",
             "adaptive",
@@ -551,10 +688,18 @@ def generate(
         and rescue.get("gate", "weak_query") == "weak_query"
     ):
         raise ValueError("invalid rescue configuration")
+    backend = config.get("retrieval_backend", "sparse")
+    if backend not in {"sparse", "exact_only"}:
+        raise ValueError("unknown retrieval backend")
+    if backend == "exact_only" and (
+        rescue.get("enabled", False)
+        or set(config["policy"]) - {"top_k", "rrf_k", "preserve_channel_union"}
+    ):
+        raise ValueError("exact-only backend does not accept rescue or fuzzy fusion policies")
     paths = load_data_paths(data_paths_config)
     _protect_outputs(output, paths)
     fingerprints = {f"{mode}_source{i}": _sha256(paths[f"{mode}_source{i}"]) for i in (1, 2, 3)}
-    if config.get("vectorizer_root"):
+    if backend == "sparse" and config.get("vectorizer_root"):
         for source in ("S2", "S3"):
             for field in ("name", "address"):
                 asset = Path(config["vectorizer_root"]) / f"{source}_{field}_vectorizer.joblib"
@@ -632,7 +777,8 @@ def generate(
                 "data_paths_config": str(data_paths_config.resolve()),
             }
             _atomic_json(manifest, state)
-        retriever = CachedRetriever(output / "index", config)
+        retriever_class = ExactOnlyRetriever if backend == "exact_only" else CachedRetriever
+        retriever = retriever_class(output / "index", config)
         retriever.build(paths, mode, fingerprints)
         offset = sum(s["query_count"] for s in state["completed_shards"])
         seen = 0
@@ -654,7 +800,10 @@ def generate(
                 evidence = pd.concat([evidence, extra], ignore_index=True)
             else:
                 rescue_stats = {"activated_queries": 0}
-            selected, gating = fuse_budgeted(evidence, queries, config["policy"], run_id=run_id)
+            if backend == "exact_only":
+                selected, gating = _fuse_exact(evidence, queries, config["policy"], run_id)
+            else:
+                selected, gating = fuse_budgeted(evidence, queries, config["policy"], run_id=run_id)
             filename = f"part-{len(state['completed_shards']):06d}.parquet"
             atomic_shard(selected, output / filename, run_id)
             counts = selected.groupby("s1_id").size().reindex(queries.entity_id, fill_value=0)
@@ -729,19 +878,31 @@ def export_fallback(output: Path, submission_root: Path, run_id: str) -> Path:
         db.execute("CREATE INDEX pairs_s1 ON pairs(s1)")
         db.execute("CREATE INDEX pairs_target ON pairs(target)")
         decoder = Decoder(global_threshold=1.0, enforce_target_ownership=True, score_margin=0.01)
-        cursor = db.execute("SELECT DISTINCT target FROM pairs WHERE score=1 ORDER BY target")
-        for (target,) in cursor:
-            rows = db.execute(
-                "SELECT s1,target,source,score FROM pairs WHERE target=? AND score=1", (target,)
-            ).fetchmany(100001)
-            if len(rows) > 100000:
-                raise MemoryError("pathological exact-owner group exceeds export memory guard")
+        # Keep each ownership group complete while amortizing DataFrame/decoder setup.
+        # The authoritative decoder still resolves all cross-query target conflicts.
+        cursor = db.execute(
+            "SELECT s1,target,source,score FROM pairs WHERE score=1 ORDER BY target,s1"
+        )
+        pending = []
+
+        def decode_batch(rows):
             frame = pd.DataFrame(rows, columns=["s1_id", "target_id", "target_source", "score"])
             decoded = decoder.decode(frame, set(frame.s1_id))
             db.executemany(
                 "INSERT INTO matches VALUES(?,?)",
                 ((s1, t) for s1, targets in decoded.items() for t in targets),
             )
+
+        for _, group in groupby(cursor, key=lambda row: row[1]):
+            rows = list(islice(group, 100001))
+            if len(rows) > 100000:
+                raise MemoryError("pathological exact-owner group exceeds export memory guard")
+            if pending and len(pending) + len(rows) > 10000:
+                decode_batch(pending)
+                pending = []
+            pending.extend(rows)
+        if pending:
+            decode_batch(pending)
         db.execute("CREATE INDEX matches_s1 ON matches(s1)")
         db.commit()
 
@@ -796,7 +957,8 @@ def export_fallback(output: Path, submission_root: Path, run_id: str) -> Path:
 def load_profile(path: Path, profile: str) -> dict[str, Any]:
     payload = yaml.safe_load(path.read_text())
     config = {**payload["runtime"], "policy": payload["profiles"][profile]}
-    config["rescue"] = {"enabled": False}
+    config.update(payload.get("profile_runtime", {}).get(profile, {}))
+    config["rescue"] = payload.get("profile_rescue", {}).get(profile, {"enabled": False})
     return config
 
 
@@ -808,7 +970,16 @@ def main() -> None:
     )
     parser.add_argument("--mode", choices=["train", "test"], required=True)
     parser.add_argument(
-        "--profile", choices=["safe_k40", "emergency_k20", "stretch_adaptive"], default="safe_k40"
+        "--profile",
+        choices=[
+            "fast_submission",
+            "safe_k40",
+            "emergency_k20",
+            "stretch_adaptive",
+            "competitive_adaptive",
+            "max_score",
+        ],
+        default="safe_k40",
     )
     parser.add_argument("--run-id")
     parser.add_argument("--output", type=Path)
@@ -816,7 +987,10 @@ def main() -> None:
     parser.add_argument(
         "--submission-output",
         type=Path,
-        help="Export conservative exact fallback using existing decoder/writer",
+        help=(
+            "Export exact fallback via existing decoder/writer; "
+            "fast test profile defaults to output"
+        ),
     )
     parser.add_argument(
         "--enable-rescue",
@@ -824,7 +998,9 @@ def main() -> None:
         help="Enable the bounded missing-address name rescue",
     )
     parser.add_argument(
-        "--rescue-config", type=Path, default=DEFAULT_CONFIG.with_name("retrieval_rescue.yaml")
+        "--rescue-config",
+        type=Path,
+        help="Explicit rescue override with --enable-rescue; otherwise retain profile defaults",
     )
     parser.add_argument(
         "--vectorizer-root", type=Path, help="Directory of existing S2/S3 name/address vectorizers"
@@ -832,6 +1008,7 @@ def main() -> None:
     parser.add_argument("--threads", type=int)
     parser.add_argument("--batch-size", type=int)
     parser.add_argument("--shard-size", type=int)
+    parser.add_argument("--memory-cache-mb", type=int, help="Bounded in-memory sparse block cache")
     parser.add_argument(
         "--top-k", type=int, help="Override final budget; clears reservations/adaptation"
     )
@@ -840,11 +1017,11 @@ def main() -> None:
     if args.vectorizer_root is not None:
         config["vectorizer_root"] = str(args.vectorizer_root)
     if args.enable_rescue:
-        config["rescue"] = {
-            **yaml.safe_load(args.rescue_config.read_text())["rescue"],
-            "enabled": True,
-        }
-    for key in ("threads", "batch_size", "shard_size"):
+        if args.rescue_config is not None or not config["rescue"].get("enabled", False):
+            rescue_path = args.rescue_config or DEFAULT_CONFIG.with_name("retrieval_rescue.yaml")
+            config["rescue"] = yaml.safe_load(rescue_path.read_text())["rescue"]
+        config["rescue"]["enabled"] = True
+    for key in ("threads", "batch_size", "shard_size", "memory_cache_mb"):
         if getattr(args, key) is not None:
             config[key] = getattr(args, key)
     if args.top_k is not None:
@@ -858,6 +1035,8 @@ def main() -> None:
         data_paths_config=args.data_paths,
         resume=args.resume,
     )
+    if args.profile == "fast_submission" and args.mode == "test" and not args.submission_output:
+        args.submission_output = Path("output")
     if args.submission_output:
         export_fallback(
             args.output or Path("artifacts/production_candidates") / run_id,

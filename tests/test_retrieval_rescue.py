@@ -146,3 +146,61 @@ def test_rebudget_rejects_corrupt_cached_rescue(tmp_path):
     )
     with pytest.raises(ValueError, match="corrupt cached rescue"):
         rebudget_cached(config, 400)
+
+
+def test_grouped_measurements_use_fold_mean_and_source_official_metric():
+    from entity_resolution.retrieval_rescue import grouped_measurements
+
+    truth = {"S1-a": {"S2-a"}, "S1-b": {"S3-b"}, "S1-c": {"S2-c"}}
+    frame = pd.DataFrame([("S1-a", "S2-a", "S2")], columns=["s1_id", "target_id", "target_source"])
+    result = grouped_measurements(frame, truth, set(), {"S1-a": 0, "S1-b": 1, "S1-c": 1}, [1], 0)
+    assert result["fold_summary"]["mean_oracle"] == 0.5
+    assert result["all"]["oracle_macro_f0_5"] == pytest.approx(1 / 3)
+    assert result["all"]["source_recall"]["S2"]["oracle_macro_f0_5"] == pytest.approx(2 / 3)
+    assert result["fold_1"]["zero_owner_queries"] == 2
+
+
+def test_incremental_cost_counts_negative_candidates_and_lost_positives():
+    truth = {"S1-a": {"S2-a", "S3-a"}}
+    frame = pd.DataFrame(
+        [("S1-a", "S2-a", "S2"), ("S1-a", "S2-negative", "S2"), ("S1-a", "S3-new-negative", "S3")],
+        columns=["s1_id", "target_id", "target_source"],
+    )
+    baseline = {("S1-a", "S3-a"), ("S1-a", "S2-negative")}
+    result = _metrics(frame, truth, baseline, 0)
+    assert result["incremental_candidates_added"] == 2
+    assert result["net_candidate_change"] == 1
+    assert result["incremental_edges_recovered"] == 1
+    assert result["edges_lost_vs_baseline"] == 1
+    assert result["source_recall"]["S2"]["candidate_rows"] == 2
+
+
+def test_streaming_oracle_matches_authoritative_in_memory_metrics(tmp_path):
+    from entity_resolution.retrieval_rescue import grouped_measurements, measure_candidate_shards
+
+    truth = {"S1-a": {"S2-a", "S3-a"}, "S1-b": {"S3-b"}, "S1-c": set()}
+    frame = pd.DataFrame(
+        [
+            ("S1-a", "S2-a", "S2"),
+            ("S1-a", "S2-negative", "S2"),
+            ("S1-b", "S2-b", "S2"),
+            ("S1-b", "S3-b", "S3"),
+        ],
+        columns=["s1_id", "target_id", "target_source"],
+    )
+    baseline = {("S1-a", "S3-a"), ("S1-a", "S2-negative")}
+    folds = {"S1-a": 0, "S1-b": 1, "S1-c": 1}
+    paths = []
+    for i, (_, part) in enumerate(frame.groupby("s1_id")):
+        path = tmp_path / f"part-{i}.parquet"
+        part.to_parquet(path, index=False)
+        paths.append(path)
+    expected = grouped_measurements(frame, truth, baseline, folds, [1], 0)
+    actual, positives = measure_candidate_shards(paths, truth, baseline, folds, [1], 0)
+    assert positives == {("S1-a", "S2-a"), ("S1-b", "S3-b")}
+    for name in expected:
+        expected[name].pop("peak_rss_mb", None)
+        actual[name].pop("peak_rss_mb", None)
+        assert actual[name] == expected[name]
+    with pytest.raises(ValueError, match="multiple candidate shards"):
+        measure_candidate_shards([*paths, paths[0]], truth, baseline, folds, [1], 0)

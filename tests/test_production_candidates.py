@@ -155,7 +155,9 @@ def test_identifier_integrity_across_batches(fixture_run, bad):
 
 
 def test_empty_inputs_and_configuration_hash(fixture_run):
-    config, paths, _ = fixture_run
+    config, paths, output = fixture_run
+    empty = pd.DataFrame(columns=pc.SOURCE_COLUMNS)
+    assert pc.CachedRetriever(output / "unbuilt", config).retrieve(empty, "test").empty
     for key, value in yaml.safe_load(paths.read_text()).items():
         if key.startswith("test_source"):
             Path(value).write_text("entity_id\tbusiness_name\tbusiness_address\tcountry\n")
@@ -347,3 +349,275 @@ def test_reuses_fitted_vectorizers_and_rejects_changed_assets(fixture_run, monke
     (assets / "S2_name_vectorizer.joblib").write_bytes(b"changed")
     with pytest.raises(ValueError, match="incompatible"):
         generate(fixture_run, resume=True)
+
+
+def test_union_retains_complementary_low_rank_channels_and_provenance():
+    query = pd.DataFrame([("S1-a", "Alpha", "Road", "US")], columns=pc.SOURCE_COLUMNS)
+    evidence = pd.DataFrame(
+        [
+            ("S1-a", "S2-a", "S2", "name_char_tfidf", 0.9, 1, False, "r", "a"),
+            ("S1-a", "S2-b", "S2", "name_char_tfidf", 0.3, 512, False, "r", "b"),
+            ("S1-a", "S3-c", "S3", "missing_address_name_char", 0.2, 512, False, "r", "c"),
+            ("S1-a", "S3-c", "S3", "exact_name_unicode_preserving", 1.0, 1, True, "r", "c"),
+        ],
+        columns=pc.EVIDENCE_COLUMNS,
+    )
+    policy = {"top_k": 1, "preserve_channel_union": True}
+    first, _ = fuse_budgeted(evidence, query, policy, run_id="union")
+    second, _ = fuse_budgeted(
+        evidence.sample(frac=1, random_state=42), query, policy, run_id="union"
+    )
+    pd.testing.assert_frame_equal(first, second)
+    assert set(first.target_id) == {"S2-a", "S2-b", "S3-c"}
+    support = json.loads(first.set_index("target_id").loc["S3-c", "support_json"])
+    assert {v["channel"]: v["rank"] for v in support} == {
+        "exact_name_unicode_preserving": 1,
+        "missing_address_name_char": 512,
+    }
+    assert first.set_index("target_id").loc["S3-c", "exact_match"]
+
+
+def test_named_profiles_and_expanded_name_budget(fixture_run):
+    for profile in ("emergency_k20", "safe_k40", "competitive_adaptive", "max_score"):
+        config = pc.load_profile(pc.DEFAULT_CONFIG, profile)
+        assert config["policy"]["top_k"] > 0
+    assert pc.load_profile(pc.DEFAULT_CONFIG, "max_score")["policy"]["preserve_channel_union"]
+    assert pc.load_profile(pc.DEFAULT_CONFIG, "competitive_adaptive")["rescue"]["enabled"]
+    generate(fixture_run)
+    config, _, output = fixture_run
+    retriever = pc.CachedRetriever(
+        output / "index", {**config, "name_top_k": 1, "address_top_k": 2}
+    )
+    query = pd.DataFrame([("S1-a", "Cafe Alpha", "12 Main St", "US")], columns=pc.SOURCE_COLUMNS)
+    frame = pd.DataFrame(retriever.sparse_rows(query, "r"), columns=pc.EVIDENCE_COLUMNS)
+    assert frame[frame.channel.eq("name_char_tfidf")].channel_rank.max() <= 1
+    assert frame[frame.channel.eq("address_char_tfidf")].channel_rank.max() <= 2
+
+
+def test_max_score_fixture_writes_union_and_can_resume(fixture_run):
+    config, paths, output = fixture_run
+    maximum = pc.load_profile(pc.DEFAULT_CONFIG, "max_score")
+    config["policy"] = maximum["policy"]
+    config["rescue"] = maximum["rescue"]
+    config["name_top_k"] = 4
+    state = generate(fixture_run)
+    assert state["complete"]
+    assert read_output(output).support_json.map(json.loads).map(len).max() > 1
+    assert generate(fixture_run, resume=True)["candidate_rows"] == state["candidate_rows"]
+
+
+def test_enabling_rescue_preserves_max_score_profile(monkeypatch):
+    import sys
+
+    seen = {}
+
+    def capture(config, **kwargs):
+        seen.update(config)
+        return {"run_id": "r", "complete": True, "candidate_rows": 0, "mean": 0}
+
+    monkeypatch.setattr(pc, "generate", capture)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["production_candidates", "--mode", "test", "--profile", "max_score", "--enable-rescue"],
+    )
+    pc.main()
+    expected = pc.load_profile(pc.DEFAULT_CONFIG, "max_score")["rescue"]
+    assert seen["rescue"] == expected
+
+
+def test_bounded_warm_cache_reuses_blocks_without_changing_candidates(fixture_run, monkeypatch):
+    generate(fixture_run)
+    config, _, output = fixture_run
+    query = pd.DataFrame([("S1-a", "Cafe Alpha", "12 Main St", "US")], columns=pc.SOURCE_COLUMNS)
+    cold = pc.CachedRetriever(output / "index", config)
+    expected = cold.sparse_rows(query, "r")
+    warm = pc.CachedRetriever(output / "index", {**config, "memory_cache_mb": 1})
+    loads = []
+    original = pc.sparse.load_npz
+
+    def tracked(path):
+        loads.append(path)
+        return original(path)
+
+    monkeypatch.setattr(pc.sparse, "load_npz", tracked)
+    assert warm.sparse_rows(query, "r") == expected
+    first_loads = len(loads)
+    assert first_loads > 0
+    assert warm.sparse_rows(query, "r") == expected
+    assert len(loads) == first_loads
+    assert 0 < warm._cached_bytes <= 2**20
+    # A block larger than the configured byte allowance is used without caching.
+    tiny = pc.CachedRetriever(output / "index", config)
+    tiny._cache_limit = 1
+    assert tiny.sparse_rows(query, "r") == expected
+    assert not tiny._block_cache and tiny._cached_bytes == 0
+
+
+def test_warm_cache_evicts_within_byte_budget(fixture_run):
+    generate(fixture_run)
+    config, _, output = fixture_run
+    query = pd.DataFrame([("S1-a", "Cafe Alpha", "12 Main St", "US")], columns=pc.SOURCE_COLUMNS)
+    reference = pc.CachedRetriever(output / "index", {**config, "memory_cache_mb": 1})
+    expected = reference.sparse_rows(query, "r")
+    largest_block = max(entry[2] for entry in reference._block_cache.values())
+    assert reference._cached_bytes > largest_block
+    constrained = pc.CachedRetriever(output / "index", config)
+    constrained._cache_limit = largest_block
+    assert constrained.sparse_rows(query, "r") == expected
+    assert 0 < constrained._cached_bytes <= largest_block
+    assert len(constrained._block_cache) < len(reference._block_cache)
+    assert constrained.sparse_rows(query, "r") == expected
+    assert constrained._cached_bytes <= largest_block
+
+
+def test_fast_cli_exports_complete_submission_without_any_sparse_work(fixture_run, monkeypatch):
+    import sqlite3
+    import sys
+
+    _, paths, output = fixture_run
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("fast_submission constructed or invoked sparse retrieval")
+
+    monkeypatch.setattr(pc.CachedRetriever, "__init__", forbidden)
+    monkeypatch.setattr(pc.CachedRetriever, "build", forbidden)
+    monkeypatch.setattr(pc.CachedRetriever, "retrieve", forbidden)
+    monkeypatch.setattr(pc.CachedRetriever, "sparse_rows", forbidden)
+    monkeypatch.setattr(pc.SparseTopNRetriever, "__init__", forbidden)
+    monkeypatch.setattr(pc.SparseTopNRetriever, "load", forbidden)
+    monkeypatch.setattr(pc, "fit_vectorizer", forbidden)
+    monkeypatch.setattr(pc, "sp_matmul_topn", forbidden)
+    monkeypatch.setattr(pc.sparse, "load_npz", forbidden)
+    monkeypatch.setattr(pc.sparse, "save_npz", forbidden)
+    monkeypatch.chdir(output.parent)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "production_candidates",
+            "--mode",
+            "test",
+            "--profile",
+            "fast_submission",
+            "--data-paths",
+            str(paths),
+            "--output",
+            str(output),
+            "--vectorizer-root",
+            str(output.parent / "FORBIDDEN_VECTORIZERS"),
+        ],
+    )
+    pc.main()
+    state = json.loads((output / "manifest.json").read_text())
+    assert state["complete"] and state["unique_query_count"] == 3
+    assert set(state["input_fingerprints"]) == {"test_source1", "test_source2", "test_source3"}
+    assert {p.name for p in (output / "index").iterdir()} == {"records.sqlite", "index.json"}
+    with sqlite3.connect(output / "index/records.sqlite") as db:
+        indexes = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='index'")}
+        assert {"idx_name", "idx_address"} <= indexes
+        assert not {"idx_folded_name", "idx_folded_address", "idx_order"} & indexes
+    frame = read_output(output)
+    assert frame.exact_match.all()
+    assert set(frame[frame.s1_id.eq("S1-a")].target_id) == {"S2-a", "S3-a"}
+    both = frame[frame.target_id.eq("S2-b")].iloc[0]
+    assert {v["channel"] for v in json.loads(both.support_json)} == {
+        "exact_name_unicode_preserving",
+        "exact_address_unicode_preserving",
+    }
+    destination = output.parent / "output/test_fast_submission"
+    matches = pd.read_csv(destination / "matching_results.tsv", sep="\t", keep_default_na=False)
+    candidates = pd.read_csv(destination / "candidate_pairs.tsv", sep="\t", keep_default_na=False)
+    assert list(matches.columns) == ["source1_entity_id", "matched_entity_ids"]
+    assert list(candidates.columns) == ["source1_entity_id", "candidate_entity_ids"]
+    assert matches.source1_entity_id.tolist() == ["S1-a", "S1-b", "S1-c"]
+    assert candidates.source1_entity_id.tolist() == matches.source1_entity_id.tolist()
+    assert matches.matched_entity_ids.tolist() == ["", "", "S2-b"]
+    assert candidates.candidate_entity_ids.tolist() == ["S2-a,S3-a", "", "S2-b,S3-b"]
+
+
+@pytest.mark.parametrize("mode", ["train", "test"])
+def test_fast_profile_resume_and_batch_invariance(fixture_run, monkeypatch, mode):
+    _, paths, output = fixture_run
+    config = pc.load_profile(pc.DEFAULT_CONFIG, "fast_submission")
+    config.update(batch_size=2, shard_size=1)
+    run = (config, paths, output)
+    original = pc.atomic_shard
+
+    def interrupted(frame, path, run_id):
+        if path.name == "part-000001.parquet":
+            raise RuntimeError("interrupted")
+        original(frame, path, run_id)
+
+    monkeypatch.setattr(pc, "atomic_shard", interrupted)
+    with pytest.raises(RuntimeError, match="interrupted"):
+        generate(run, mode=mode)
+    first_hash = pc._sha256(output / "part-000000.parquet")
+    monkeypatch.setattr(pc, "atomic_shard", original)
+    assert generate(run, mode=mode, resume=True)["complete"]
+    assert pc._sha256(output / "part-000000.parquet") == first_hash
+    other = ({**config, "batch_size": 3, "shard_size": 3}, paths, output.with_name("other"))
+    generate(other, mode=mode)
+    pd.testing.assert_frame_equal(read_output(output), read_output(other[2]))
+    state_path = output / "manifest.json"
+    state = json.loads(state_path.read_text())
+    state["complete"] = False
+    state_path.write_text(json.dumps(state))
+    (output / "index/records.sqlite").write_bytes(b"corrupt")
+    with pytest.raises(ValueError, match="corrupt exact index"):
+        generate(run, mode=mode, resume=True)
+
+
+def test_fast_exact_fusion_matches_existing_fusion_and_keeps_overflow():
+    query = pd.DataFrame([("S1-a", "Alpha", "Road", "US")], columns=pc.SOURCE_COLUMNS)
+    evidence = pd.DataFrame(
+        [
+            ("S1-a", "S2-a", "S2", "exact_name_unicode_preserving", 1.0, 1, True, "r", "a"),
+            ("S1-a", "S2-a", "S2", "exact_address_unicode_preserving", 1.0, 1, True, "r", "a"),
+            ("S1-a", "S3-b", "S3", "exact_address_unicode_preserving", 1.0, 1, True, "r", "b"),
+        ],
+        columns=pc.EVIDENCE_COLUMNS,
+    )
+    policy = {"top_k": 1}
+    expected, _ = fuse_budgeted(evidence, query, policy, run_id="r")
+    actual, _ = pc._fuse_exact(pd.concat([evidence, evidence]), query, policy, "r")
+    pd.testing.assert_frame_equal(expected, actual)
+    assert len(actual) == 2
+
+
+def test_fast_rejects_rescue_and_preserves_existing_profile_depth(fixture_run):
+    _, paths, output = fixture_run
+    config = pc.load_profile(pc.DEFAULT_CONFIG, "fast_submission")
+    config["rescue"] = {"enabled": True, "top_k": 20, "threshold": 0.2}
+    with pytest.raises(ValueError, match="exact-only backend does not accept rescue"):
+        generate((config, paths, output))
+    for profile, budget in (("emergency_k20", 20), ("safe_k40", 40), ("stretch_adaptive", 40)):
+        old = pc.load_profile(pc.DEFAULT_CONFIG, profile)
+        assert old.get("retrieval_backend", "sparse") == "sparse"
+        assert old["policy"]["top_k"] == budget
+        for field in ("name", "address"):
+            assert old.get(f"{field}_top_k", old["sparse"]["top_k"]) == 80
+
+
+def test_batched_export_rejects_ambiguous_owners_across_query_shards(fixture_run, monkeypatch):
+    from entity_resolution.decode import Decoder
+
+    _, paths, output = fixture_run
+    mapping = yaml.safe_load(paths.read_text())
+    source = Path(mapping["test_source1"])
+    source.write_text(source.read_text() + "S1-duplicate\tBeta\t9 Road\tUS\n")
+    config = pc.load_profile(pc.DEFAULT_CONFIG, "fast_submission")
+    config.update(batch_size=2, shard_size=1)
+    generate((config, paths, output))
+    calls = []
+    original = Decoder.decode
+
+    def observe(self, frame, ids):
+        calls.append(len(frame))
+        return original(self, frame, ids)
+
+    monkeypatch.setattr(Decoder, "decode", observe)
+    destination = pc.export_fallback(output, output.parent / "submission", "fast")
+    matches = pd.read_csv(destination / "matching_results.tsv", sep="\t", keep_default_na=False)
+    assert matches.matched_entity_ids.eq("").all()
+    assert calls == [2]

@@ -1,98 +1,139 @@
-# Retrieval rescue handoff — 2026-09-27
+# Retrieval rescue: final integration handoff — 2026-09-27
 
-**The production and fallback submission paths are implemented and tested. Retrieval remains inadequate for the requested competition score.** The selected stretch reaches held-out oracle macro F0.5 **0.989124140**, covering **5,218/5,371** positive edges. Even the complete existing-plus-rescue union reaches only **0.989298382**. A classifier cannot exceed that candidate oracle on this population. No official submission score or full-corpus production performance is claimed.
+`fast_submission` is the hard-deadline fallback. It produces both complete submission TSVs directly from label-free exact lookups, without any K20/K40 run or sparse artifacts. K20, K40 and stretch retain their original per-channel K80 retrieval depth and are **not verified to finish inside the submission window**. No new retrieval experiment or full local production run was performed during this integration repair.
 
-Implementation commit: `f064d110cdf22f39b16149925c62042740d65a90`. Base: `f9708345608e77940d34da12110a8cb62a47d873`. Branch: `lane-retrieval-rescue`. The final branch tip adds this report in a separate documentation commit. Git status was clean after the implementation commit; the final clean-tree and origin-tip checks accompany delivery. No merge or pull request was made.
+The highest completed diagnostic mean oracle is **0.9911914026818882**, with held-out folds 3–4 pooled oracle **0.9907835387476042**. These are retrieval ceilings, not achieved model/submission scores. The fast fallback has no measured accuracy score and deliberately trades recall for execution speed.
 
-`UV_CACHE_DIR=/tmp/retrieval-rescue-uv MPLCONFIGDIR=/tmp/retrieval-rescue-mpl uv run pytest`: **76 passed** (4.76 seconds on the final configuration). `UV_CACHE_DIR=/tmp/retrieval-rescue-uv uv run ruff check .`: **All checks passed**. The complete implementation diff and whitespace checks were reviewed. Only the following nine owned files changed:
+## Delivery and verification
 
-- `src/entity_resolution/production_candidates.py`
-- `src/entity_resolution/retrieval_rescue.py`
-- `src/entity_resolution/candidate_fusion.py`
-- `src/entity_resolution/missed_edge_analysis.py`
+Branch: `lane-retrieval-rescue`. Repair parent: `2d9f41f559a931ee092b420b422daab9f2f9f372`; original base: `f9708345608e77940d34da12110a8cb62a47d873`. The final repair is one commit; its full hash and actual push/clean-tree outcome are returned with delivery (a commit cannot embed its own hash). Obtain it with `git rev-parse HEAD` after checkout. No master merge or pull request.
+
+Complete pytest suite: **91 passed** (final suite result; see delivery for elapsed time). Ruff: **All checks passed**. Whitespace check: `git diff --check` passed. Verification commands:
+
+```sh
+UV_CACHE_DIR=/tmp/retrieval-rescue-uv MPLCONFIGDIR=/tmp/retrieval-rescue-mpl uv run pytest
+UV_CACHE_DIR=/tmp/retrieval-rescue-uv uv run ruff check .
+```
+
+Exact files in the final repair commit relative to `2d9f41f`:
+
 - `configs/production_candidates.yaml`
 - `configs/retrieval_rescue.yaml`
+- `src/entity_resolution/candidate_fusion.py`
+- `src/entity_resolution/production_candidates.py`
+- `src/entity_resolution/retrieval_rescue.py`
 - `tests/test_production_candidates.py`
 - `tests/test_retrieval_rescue.py`
 - `reports/retrieval_rescue_handoff.md`
 
-The tests cover both modes with an inaccessible ground-truth path, source/identifier validation, compact Arrow dtypes, empty/null-like inputs, exact overflow, deduplication and provenance, source/channel reservations, rank weights, stable ties across target block sizes and thread counts, parser/query batch invariance, adaptive gates, enabled/disabled rescue, atomic validation failure, interruption before and after shard rename, resume incompatibility and corruption, fitted-vocabulary reuse, country partitioning, raw-output guards, and the existing decoder/submission writer. Existing retrieval APIs and behavior remain intact.
+Every preexisting uncommitted change was reviewed. Retained: channel-union provenance, grouped/source metrics, bounded streaming evaluation, disk-backed experiment reproduction helpers, per-field sparse budget overrides, bounded LRU cache and their tests. Corrected: the uncommitted emergency per-channel K20 overrides were removed, restoring K80 evidence; the unmeasured name-K512 override was removed from `max_score`. No blanket reset/discard was used. The former 76-test report was stale; the pre-repair suite had 85 tests and the repair adds six cases.
 
-**Measurement population and selection.** All rows below use the same 2,000 S1 queries in existing grouped held-out folds 3–4, with 5,371 positive edges. Development folds 0–2 contain 3,000 queries. The original authoritative fold creation and ground-truth parser were reused. Every oracle is checked against `evaluate_macro_f0_5_reference`; no metric, fold, decoder, or submission-writer implementation changed. The sample is truth-stratified and has already been diagnosed: these are diagnostic held-out measurements, not untouched final validation. The existing uniform sample was not evaluated. No test ownership, test labels, external business data, or numeric entity-ID features were used.
+## Fast submission contract
 
-The earlier full-diagnostic top-80 result (97.041% recall, 0.98846 oracle, 319.06 mean) covered all 5,000 sampled queries. Its separately measured held-out ceiling below must not be confused with that full-sample statistic. `fixed_k80` means 80 total selected pairs; `top80_union_ceiling` means the entire union of per-source/per-view top-80 evidence.
+A separate `ExactOnlyRetriever` shares the normalized ID-registry and exact-probe helpers with production. It scans only the configured mode's three source TSVs, validates prefixes and duplicate IDs, creates a disk-backed SQLite registry and two Unicode-preserving exact indexes, then probes exact name and exact address within country/source. Normalization retains the existing null-like handling, Unicode case folding and punctuation/whitespace treatment. All exact pairs survive; combined evidence is deduplicated with both channels preserved. It does not cap exact evidence to K40. Its specialized exact fusion produces the same schema/provenance as regular exact fusion without per-query fuzzy gates.
 
-| Configuration | Covered / 5,371 | Edge recall | S2 recall | S3 recall | Full / partial / zero owner queries | Oracle macro F0.5 |
+It skips **all** vectorizer loading/fitting/fingerprinting, TF-IDF transforms, sparse matrix construction/serialization/loading, country-by-block sparse top-N multiplication, sparse cutoff-tie recomputation, missing-address sparse rescue, and fuzzy quality/budget selection. It does not wait for or require an existing sparse index. Fast mode uses Unicode-preserving exact matches only; accent-folded exact and approximate evidence remain available in the unchanged sparse profiles.
+
+For a test run, the CLI automatically calls the existing submission writer, defaulting to `output` if `--submission-output` is absent. Candidates include name-only, address-only and combined exact matches. Final matches require **both exact name AND exact address**. The unchanged authoritative `Decoder` applies global target ownership with threshold 1 and margin .01; equal-score competing owners are rejected. Decoder calls are batched over complete target groups, including owners from different candidate shards. Every S1 gets a row in both TSVs, including zero-evidence queries.
+
+The no-sparse test replaces both sparse retriever constructors, cached build/retrieve/sparse methods, vectorizer load/fit, sparse matrix load/save and sparse top-N with functions that fail if called. It runs the real fast CLI through schema-valid full-fixture export, with inaccessible labels and vectorizer assets. Additional tests cover fast train/test isolation, interruption/resume and corruption, batch invariance, exact overflow/provenance, original profile retrieval depths, rescue rejection and cross-shard ownership conflicts. No synthetic accuracy result is presented as a real score.
+
+## Exact production commands and paths
+
+On the cloud machine, make `configs/data_paths.yaml` resolve the immutable organizer files. The fast command needs only those source TSVs and the installed repository environment. Sparse commands additionally require the four existing `artifacts/blocking/S{2,3}_{name,address}_vectorizer.joblib` assets. No added dependencies or external data are required.
+
+Fast, including complete submission export:
+
+```sh
+uv run python -m entity_resolution.production_candidates --mode test --profile fast_submission --run-id test_fast_submission --data-paths configs/data_paths.yaml --output artifacts/production_candidates/test_fast_submission --submission-output output
+```
+
+Expected submission files: **`output/test_fast_submission/matching_results.tsv`** and **`output/test_fast_submission/candidate_pairs.tsv`**. They are generated by this command; no prior K20/K40 execution is needed.
+
+K20 (original evidence depth preserved), including conservative export:
+
+```sh
+uv run python -m entity_resolution.production_candidates --mode test --profile emergency_k20 --run-id test_emergency_k20 --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_emergency_k20 --submission-output output
+```
+
+K40, including conservative export:
+
+```sh
+uv run python -m entity_resolution.production_candidates --mode test --profile safe_k40 --run-id test_safe_k40 --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_safe_k40 --submission-output output
+```
+
+Stretch K400 with the original missing-address K20 rescue, including conservative export:
+
+```sh
+uv run python -m entity_resolution.production_candidates --mode test --profile stretch_adaptive --enable-rescue --run-id test_stretch_adaptive --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_stretch_adaptive --submission-output output
+```
+
+For interrupted generation, repeat the exact command with `--resume`. A completed export directory is intentionally not overwritten: resume generation/export only when `output/<run_id>` does not already exist, or choose another submission root. To generate training candidates, change mode, run ID and candidate directory to train equivalents and omit `--submission-output`; labels are still never read by generation.
+
+Each candidate directory contains `part-*.parquet`, `manifest.json`, and `index/{index.json,records.sqlite}`. Sparse profiles additionally have fitted vectors and matrix blocks. Export builds `submission.sqlite` beside the shards and writes to `output/<run_id>/`. Atomic shard validation, run/config/input/code/dependency fingerprints, contiguous resume validation and exclusive run-directory locking apply to the fast profile too. Code changes intentionally invalidate resume from older implementation hashes.
+
+`competitive_adaptive` preserves the base K80 channel union plus gated missing-address K80 at .20. `max_score` preserves that base union plus gated missing-address K2048 at .18, with explicit source-aware RRF weights and retained per-channel scores/ranks. Its 32-GiB optional sparse LRU is byte-bounded, uses 250-query shards and never truncates complementary channels to meet a cosmetic budget. Neither profile includes unmeasured name/address expansions.
+
+No query/shard-range distributed execution was added. Existing shards support single-writer resume; independently produced partial runs must not be concatenated into a submission without a validated coverage/manifest merge and global ownership decode. Adding that contract was deferred to protect closure.
+
+## Runtime, memory and accuracy limits
+
+**Fast eliminates the multi-day sparse bottleneck; full-data completion time is not measured or guaranteed.** It still pays source SHA-256 reads, one normalized registry-building scan, SQLite index construction, a query scan with indexed probes, exact shard writes and global submission export. Complexity is dominated by source rows, index sorting and actual exact hits, not query-by-corpus similarity work. On a CPU cloud machine with local SSD, plan for tens of minutes and allow an hour or more for millions of records; this is a planning allowance, not a benchmark. Slow/network storage or common exact keys can take longer. The tiny-fixture tests verify behavior, not deadline throughput. Start this fallback first and inspect actual completion/progress before relying on a wall-clock deadline.
+
+Fast preparation uses a 32-MiB SQLite page cache and 10,000-row parser batches; candidate shards are 1,000 queries. Ordinary process memory is expected to be roughly 0.5–3 GiB, unmeasured at full scale. The existing writer sorts all S1 IDs in RAM (O(S1)); pair mappings and global ownership groups are disk-backed. Pathological exact collisions can raise memory and output volume; the existing two-million-evidence-row guard fails explicitly, without silently dropping candidates. Smaller shards can address aggregate-shard overflow. An individual ownership group above 100,000 rows also fails visibly. Provision several times the raw TSV size in SSD space for registry, temporary indexes, exact evidence and export maps. The planned 128-GB machine has ample nominal RAM for the ordinary fast path; RAM alone does not remove disk/runtime limits.
+
+Fast accuracy will be substantially below the approximate-retrieval oracle: typos, transliteration, field edits, missing fields and cross-country discrepancies can lose matches, and name-only/address-only candidates are intentionally not emitted as final matches. No validation tuning or new accuracy experiment was run for it.
+
+**K20, K40 and stretch are not verified to finish inside the deadline.** They still build and search four sparse channels at per-channel K80, regardless of the smaller final fusion K. Historical four-channel retrieval took about 1,435 seconds per 5,000 queries; an unoptimized linear extrapolation was about 138 hours for test (176 hours for train) at four threads. Cached matrices, a warm LRU or 16 cloud threads may improve this, but no full-run speedup or deadline guarantee was measured. Do not use these profiles as the hard-deadline fallback.
+
+The high-score union is also expensive: 2,529.2548 mean candidates extrapolates to billions of test pairs. A 128-GB machine can stream the bounded generator, but downstream feature storage and runtime must be budgeted separately; no full-scale feasibility claim is made. Local evaluation peaks were about 1.9 GiB. The max-score production LRU alone permits 32 GiB plus query/result/native-library overhead, so it is intended for the cloud, not the 8-GB laptop.
+
+## Completed leakage-safe measurements (frozen; no new experiments)
+
+These results use the existing five grouped folds, 1,000 queries each: 5,000 diagnostic S1 queries and 13,415 positive edges; folds 3–4 have 2,000 queries and 5,371 edges. The authoritative ground-truth parser and per-S1 macro F0.5 evaluator are unchanged. Empty-owner and empty-candidate queries remain in the denominator. Source scores project truth onto one source while keeping every query. These folds were repeatedly diagnosed, so they are **reused validation**, not untouched final validation. No test labels, external augmentation or numeric-ID ranking features were used.
+
+The highest mean improves over the quoted original **0.98846 by 0.0027314026818882065**, and over its exact recomputation **0.9884639999033469 by 0.0027274027785413324**. Candidate-conditioned theoretical downstream ceiling is **0.9911914026818882** across these folds and **0.9907835387476042** on pooled folds 3–4, assuming perfect discrimination/decoding. The actual ranker will ordinarily score lower. 0.990 was exceeded on the pooled populations; 0.995 and 0.997 were not reached, and fold 2 remains below .990.
+
+| Configuration | Mean fold oracle | Held-out oracle | Covered / 13,415 | Full-owner / 5,000 | Mean candidates | Candidate rows |
 |---|---:|---:|---:|---:|---:|---:|
-| `baseline_v2_k40` | 4,907 | 91.361% | 92.671% | 90.008% | 1,681 / 270 / 49 | 0.957507288 |
-| `fixed_k20` | 4,736 | 88.177% | 89.886% | 86.412% | 1,583 / 357 / 60 | 0.944273468 |
-| `fixed_k40` | 4,907 | 91.361% | 92.671% | 90.008% | 1,681 / 270 / 49 | 0.957507288 |
-| `source_k40` | 4,908 | 91.380% | 92.781% | 89.932% | 1,683 / 268 / 49 | 0.957495283 |
-| `weighted_source_k40` | 4,731 | 88.084% | 92.781% | 83.232% | 1,567 / 383 / 50 | 0.948252602 |
-| `channel_k40` | 4,908 | 91.380% | 92.671% | 90.045% | 1,682 / 269 / 49 | 0.957552743 |
-| `fixed_k80` | 5,009 | 93.260% | 94.247% | 92.241% | 1,745 / 221 / 34 | 0.968143859 |
-| `stretch_adaptive` | 5,209 | 96.984% | 97.582% | 96.366% | 1,863 / 127 / 10 | 0.988637398 |
-| `top80_union_ceiling` | 5,213 | 97.058% | 97.655% | 96.442% | 1,866 / 124 / 10 | 0.988909043 |
-| `rescue_union_ceiling` | 5,221 | 97.207% | 97.838% | 96.556% | 1,874 / 116 / 10 | 0.989298382 |
-| `rescue_stretch` | 5,210 | 97.002% | 97.728% | 96.253% | 1,868 / 122 / 10 | 0.988727519 |
-| `rescue_adaptive_k400` | 5,218 | 97.151% | 97.801% | 96.480% | 1,871 / 119 / 10 | 0.989124140 |
+| emergency_k20 | 0.9431537287735587 | 0.9442734676448599 | 11816 | 3958 | 25.344 | 126720 |
+| safe_k40 | 0.9573522961155909 | 0.9575072883864754 | 12248 | 4200 | 43.9498 | 219749 |
+| fixed_k80 diagnostic | 0.9693540280479404 | 0.9681438587138225 | 12538 | 4377 | 81.8334 | 409167 |
+| original per-channel K80 union | 0.9884639999033469 | 0.9889090426515118 | 13018 | 4664 | 319.0568 | 1595284 |
+| rescue K20 union | 0.9898801781695251 | 0.9892983824783517 | 13055 | 4701 | 351.8832 | 1759416 |
+| stretch_adaptive + rescue K20 | 0.9898009573903044 | 0.9891241400541092 | 13051 | 4697 | 342.9982 | 1714991 |
+| competitive_adaptive (rescue K80) | 0.990703296449095 | 0.9903713296924279 | 13080 | 4724 | 464.1224 | 2320612 |
+| rescue K512, threshold .20 | 0.9911420939261278 | 0.9907436001915366 | 13096 | 4738 | 1124.235 | 5621175 |
+| rescue K512, threshold .18 | 0.9911516177356517 | 0.9907674097153462 | 13097 | 4739 | 1148.7282 | 5743641 |
+| rescue K2048, threshold .20 | 0.9911818788723645 | 0.9907597292237947 | 13098 | 4740 | 2385.8466 | 11929233 |
+| max_score (rescue K2048, .18) | 0.9911914026818882 | 0.9907835387476042 | 13099 | 4741 | 2529.2548 | 12646274 |
 
-Queries with no true owners count as fully covered under the authoritative metric. Every query remains in the denominator, including queries with no candidates. Counts and percentiles include those queries.
+The saved early JSON key `competitive_adaptive` refers to the old adaptive K400/rescue-K20 experiment; current code calls that measurement `legacy_adaptive_k400`. The current named `competitive_adaptive` matches `rescue_k80_union` and was replayed through production gating, fusion, schema validation and atomic shard writing: 2,320,612 rows, exactly 0.990703296449095 mean oracle, 108.883732583 seconds for fusion/write, 62,901,092 Parquet bytes and 1,412.390625 MiB process peak. The max-score union was measured from production-backend rescue evidence plus cached original channels; full end-to-end production replay for max was not completed. Tiny fixtures test its configured pipeline. Old diagnostic exact channels were capped at 80; production retains all exact matches, so full-run counts and small backend tie differences can differ.
 
-| Configuration | Mean | Median | p95 | Maximum | Candidate rows | New positives / positives lost vs K40 | New candidate pairs vs K40 | Candidates added / new positive | Seconds | Peak MiB |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `baseline_v2_k40` | 43.7810 | 40.0 | 64.0 | 187 | 87,562 | 0 / 0 | 0 | — | 1.69 | 1245.3 |
-| `fixed_k20` | 25.1420 | 20.0 | 64.0 | 187 | 50,284 | 0 / 171 | 0 | — | 37.61 | 1245.3 |
-| `fixed_k40` | 43.7810 | 40.0 | 64.0 | 187 | 87,562 | 0 / 0 | 0 | — | 36.72 | 1245.3 |
-| `source_k40` | 43.7810 | 40.0 | 64.0 | 187 | 87,562 | 5 / 4 | 1,459 | 291.80 | 36.32 | 1245.3 |
-| `weighted_source_k40` | 43.7810 | 40.0 | 64.0 | 187 | 87,562 | 19 / 195 | 16,420 | 864.21 | 36.24 | 1245.3 |
-| `channel_k40` | 43.7810 | 40.0 | 64.0 | 187 | 87,562 | 1 / 0 | 1 | 1.00 | 41.16 | 1245.3 |
-| `fixed_k80` | 81.6670 | 80.0 | 80.0 | 187 | 163,334 | 102 / 0 | 75,772 | 742.86 | 38.56 | 1245.3 |
-| `stretch_adaptive` | 308.2085 | 318.0 | 320.0 | 320 | 616,417 | 302 / 0 | 528,889 | 1,751.29 | 40.47 | 1245.3 |
-| `top80_union_ceiling` | 318.8915 | 318.0 | 325.0 | 414 | 637,783 | 306 / 0 | 550,221 | 1,798.11 | 0.33 | 1245.3 |
-| `rescue_union_ceiling` | 351.5905 | 352.0 | 361.0 | 453 | 703,181 | 314 / 0 | 615,619 | 1,960.57 | 37.62 | 1245.3 |
-| `rescue_stretch` | 310.3370 | 320.0 | 320.0 | 320 | 620,674 | 303 / 0 | 533,146 | 1,759.56 | 95.19 | 1900.9 |
-| `rescue_adaptive_k400` | 341.8780 | 352.0 | 361.0 | 400 | 683,756 | 311 / 0 | 596,228 | 1,917.13 | 78.23 | 1317.5 |
+| Fold | Original union oracle | Competitive oracle | Max-score oracle | Max covered edges | Max full-owner queries |
+|---|---:|---:|---:|---:|---:|
+| 0 | 0.9883227458815694 | 0.9911506679594916 | 0.9914840012928248 | 2617/2676 | 951 |
+| 1 | 0.9905618937222198 | 0.9934731491334753 | 0.9935640582243843 | 2626/2679 | 955 |
+| 2 | 0.9856172746099217 | 0.9881500057676529 | 0.9893418763970235 | 2609/2689 | 938 |
+| 3 | 0.9889788659711574 | 0.9909429422174916 | 0.9913371655226495 | 2614/2673 | 949 |
+| 4 | 0.9888392193318664 | 0.9897997171673641 | 0.990229911972559 | 2633/2698 | 948 |
 
-New candidate pairs are set additions, not net row-count changes. The selected stretch adds 596,228 held-out pairs and removes 34 baseline negative pairs, for a net increase of 596,194. It loses no baseline positive edges. Times for fusion rows measure selection across all 5,000 sampled queries, excluding shared artifact loading. Rescue union time includes the one retrieval pass; rescue-stretch time includes retrieval and fusion. The final K400 re-budget time includes recreating the K40 reference and re-fusing saved rescue evidence, with no new retrieval. Peak RSS is each process’s cumulative high-water mark, not an isolated per-configuration allocation.
+| Population | Source | Max source oracle | Covered edges | Recall | Full-owner queries | Candidate rows |
+|---|---|---:|---:|---:|---:|---:|
+| all | S2 | 0.9920903679653679 | 6640/6772 | 0.980507974010632 | 4885 | 6265721 |
+| all | S3 | 0.9902847689075632 | 6459/6643 | 0.972301670931808 | 4844 | 6380553 |
+| held_out | S2 | 0.9925239448051949 | 2681/2729 | 0.9824111396115793 | 1957 | 2494097 |
+| held_out | S3 | 0.9908142586580089 | 2566/2642 | 0.9712339137017411 | 1934 | 2548972 |
 
-| Configuration | Development oracle | Development full-owner queries | Development edge recall |
-|---|---:|---:|---:|
-| `baseline_v2_k40` | 0.957248968 | 2,519 | 91.261% |
-| `fixed_k20` | 0.942407236 | 2,375 | 88.016% |
-| `fixed_k40` | 0.957248968 | 2,519 | 91.261% |
-| `source_k40` | 0.956776820 | 2,517 | 91.186% |
-| `weighted_source_k40` | 0.945214530 | 2,334 | 87.581% |
-| `channel_k40` | 0.957360079 | 2,521 | 91.285% |
-| `fixed_k80` | 0.970160808 | 2,632 | 93.598% |
-| `stretch_adaptive` | 0.988151432 | 2,797 | 97.016% |
-| `top80_union_ceiling` | 0.988167305 | 2,798 | 97.029% |
-| `rescue_union_ceiling` | 0.990268042 | 2,827 | 97.389% |
-| `rescue_stretch` | 0.989779031 | 2,821 | 97.290% |
-| `rescue_adaptive_k400` | 0.990252169 | 2,826 | 97.377% |
+The max configuration improves on the original union in **all five folds and both sources**. Fold standard deviation is 0.001419969502400521; minimum is 0.9893418763970235. Compared with the K512/.18 rescue union, however, K2048/.18 gains only two positive edges and 0.000039784946236465224 mean oracle, concentrated in two folds, while mean volume grows from 1,148.7282 to 2,529.2548. That marginal gain is weak evidence of generalization; it is retained for the requested maximum-score option, while K80 rescue is the practical score/runtime option. Lowering threshold .20 to .18 adds one edge in one fold. No claim of uniform gain is made for either small marginal change.
 
-The reliable K40 baseline was frozen before rescue work. Source reservations at K40 mostly traded positive edges; the existing S3 weighting prescription regressed. Channel reservations added two development edges and one held-out edge, a marginal diagnostic change that was not promoted into the frozen fallback. Among stretch variants, selection used development oracle, full-owner coverage, edge recall, p95, mean, then runtime. The single post-rescue budget repair was justified by development coverage lost during fusion (29 newly available channel positives but only 22 net positives retained at K320), not by a test-label search.
+Max cost on all queries: **12,646,274 rows**, mean **2,529.2548**, median **2,262.5**, p95 **4,412**, maximum **4,535**; 13,099/13,415 edges covered; full/partial/zero owners **4,741/242/17**. Versus K40: 851 positives recovered, none lost, 12,426,525 added pairs, 14,602.26204465335 candidates per newly covered edge. Rescue retrieval alone took **508.3121742500225 seconds**; evaluation-process peak **1,939.40625 MiB**. That timing excludes original-channel retrieval/index construction and is not a full generation runtime.
 
-| Selected stretch split | Oracle F0.5 |
-|---|---:|
-| Development | 0.990252169 |
-| Held-out combined | 0.989124140 |
-| Held-out fold 3 | 0.989117124 |
-| Held-out fold 4 | 0.989131157 |
+Held-out max cost: **5,043,069 rows**, mean **2,521.5345**, median **2,271.5**, p95 **4,412**, max **4,509**; full/partial/zero owners **1,897/94/9**. It covers 5,247/5,371 edges, leaves **124** unavailable, and gains 34 over the original full union (no original-channel fusion truncation in union mode). The missing-address gate activated 4,844/5,000 diagnostic queries, so it should not be described as selective or low-volume.
 
-| Threshold | Selected development | Selected held-out | Full rescue union held-out |
-|---|---|---|---|
-| 0.990 | Reached | Not reached | Not reached |
-| 0.995 | Not reached | Not reached | Not reached |
-| 0.997 | Not reached | Not reached | Not reached |
+## Missed-edge audit and deliberately deferred work
 
-**One targeted mechanism.** Existing views already supplied Unicode-preserving and accent-folded exact name/address matches and Unicode name/address character TF-IDF (char_wb 3–5, min_df 2, 50,000 features, cosine threshold 0.20, K80 per source/view). No redundant normalization view or neural dependency was added. The new channel retrieves name top-20 separately within each source’s missing-address target subset, using the existing fitted name vocabulary. Diagnostic retrieval reused `SparseTopNRetriever`; production filters and reuses its cached name matrices. The subset contains 168,967 S2 and 175,916 S3 target records.
-
-The label-free gate uses missing fields, normalized lengths (<5 name or <8 address), minimum within-channel top-1/top-2 margin (<0.05), maximum channel agreement (<2), exact evidence, and viable fuzzy views (<2). Any weak signal expands the budget; rescue additionally requires a usable name. Missing evidence activates the safe expanded fallback. Both adaptive budgets and rescue activate for 4,844/5,000 queries (96.88%). This dataset makes the gate broad; it does not support a low-volume claim.
-
-The new channel adds 98,734 development pairs and recovers 29 previously absent development edges (3,404.62 pairs per new positive), within the prespecified 10,000-pair cost cap. Held-out it adds 65,398 previously absent pairs and recovers 8 of the 34 original missing-address/top-80-absent positive edges (8,174.75 pairs per new positive). At K320, seven old covered positives are displaced, leaving only one net held-out improvement over the previous adaptive configuration. The K400 re-budget restores those seven and one additional original-channel edge. No second retrieval mechanism, threshold sweep, or further sparse pass was run. The mechanism is retained only as an optional stretch setting; its absolute validation gain is small.
-
-**Diagnosis and remaining misses.** The K40 baseline missed 464 held-out edges: 306 were fusion losses and 158 were absent from all old channels. The deterministic flags overlap and are heuristic descriptions, not causal labels. After the selected stretch, **153 edges remain missed: 150 channel failures and 3 fusion/gating losses**; none of the baseline positives is newly lost. No missing-name or both-fields-sparse record occurred among these baseline misses; those paths are still covered synthetically.
+The original K40 held-out audit had 464 misses: 306 fusion losses and 158 absent-channel edges. The table below preserves the earlier audited taxonomy and sanitized examples, with **historical K400/rescue-K20** remaining counts. Those remaining counts are not the final max-score taxonomy. A new detailed taxonomy for max was deliberately deferred; its aggregate remaining count is 124 above. Flags overlap and describe symptoms, not proven causes.
 
 | Class | Baseline misses | % of 464 | Existing channel present | Newly recovered by rescue channel beyond old union | Remaining after selected stretch | Sanitized representative |
 |---|---:|---:|---:|---:|---:|---|
@@ -111,81 +152,8 @@ The new channel adds 98,734 development pairs and recovers 29 previously absent 
 | absent_every_channel | 158 | 34.05% | 0 | 8 | 150 | `004f519ecbe528d1`; name tokens 4/12; missing address=False |
 | other_unknown | 44 | 9.48% | 33 | 0 | 11 | `002f0803e51c1eec`; name tokens 3/1; missing address=False |
 
-“Existing channel present” answers whether fusion could have recovered that edge without new retrieval. Script mismatch is only “cross-language-like,” not verified translation. Typographical corruption uses normalized-name similarity 70–<100%; digit conflict compares nonempty address digit sequences. Examples contain only content hashes and token/missingness counts.
+Fusion/channel preservation and the existing missing-address name index were the supported rescue mechanisms. The retained source-aware RRF uses per-source/channel weights and quotas, and retains provenance instead of summing incomparable cosine scores. Short-name, missing-field, margin and agreement gates are label-free. No new transliteration, embeddings, external API, ID-derived model signal or digit-dropping rule was introduced.
 
-| Class | Proposed mechanism / decision | Expected extra candidate cost |
-|---|---|---|
-| Missing/null-like name | Existing address-only retrieval; no new view justified by this audit | 0 new channels |
-| Missing address | Implemented missing-address-target name subindex | At most 20 per source per gated query before deduplication |
-| Both fields sparse | Input insufficiency; preserve zero-candidate queries and report them | No unsupported candidate expansion |
-| Accent/Unicode | Existing accent-folded exact view already supplies both flagged edges | 0 new channels |
-| Legal suffix | Existing helper could support a future stripped-name view; not evaluated in this sprint | Would require a separately capped view; cost unmeasured |
-| Token reorder | Existing char view and fusion already recover most; no new view | 0 here |
-| Segmentation | Existing char view plus higher budget recovers all five flagged edges | 0 new channels |
-| Abbreviation/initials | No observed misses justify a new view | 0 here |
-| Typographical corruption | Existing char retrieval plus bounded rescue; shorter n-grams remain future work | Implemented rescue bounded at 40 raw pairs/query; other costs unmeasured |
-| Digit/address conflict | Preserve digits; no large digit-token expansion (prior feasibility showed extreme volume) | 0 here; a future view needs a strict cap |
-| Cross-language-like | No existing lightweight transliteration implementation was found; not added | Not evaluated |
-| Fusion truncation | Source/channel reservations, RRF, then adaptive K400 repair | Measured volume tables above |
-| Absent every channel | Missing-address subindex recovers eight; remaining failures need new evidence | 40 raw pairs/gated query for the implemented mechanism |
-| Other/unknown | Retain as unresolved; no invented mechanism | Unmeasured |
+Before integration repair, name-K512, name-K1024 and address-K512 retrieval jobs had been launched and later exited; their completed evidence sidecars are present, but **no oracle evaluation or selection claim** was made for those expansions. Their reproduction helpers are preserved. Further evaluation of those outputs, stripped legal suffixes, alternate short n-grams, transliteration, a fresh untouched validation sample, distributed range merging and full-cloud throughput checks were deliberately deferred because the user stopped experimentation and required closure. No further retrieval job was launched during repair.
 
-**Production contracts.** `safe_k40` is frozen global weighted RRF with uniform weights and a nominal total K40; `emergency_k20` uses K20. `stretch_adaptive` uses base K40, expanded K400, source reservations of 20/20, and the optional missing-address rescue flag. All preserve exact matches and identical content/evidence boundary ties beyond nominal caps. Source reservations precede channel reservations; unused seats return to global RRF order. Exact preservation takes precedence when a nominal budget cannot satisfy every reservation.
-
-Output has the eight requested fields with Arrow strings, float32 scores, int16 ranks, and boolean exact flags, plus `support_json` and float32 `fusion_score`. The primary `channel`/score/rank describes one deterministic observation; `support_json` retains every distinct channel’s score, rank, and exact flag. Raw cosine scores are not summed across channels. IDs are used only for integrity, joins, and final serialization, never as ranking features.
-
-Raw source files are only read through the configured data-path resolver with explicit TSV separators. A SQLite ID registry rejects duplicates across parser batches and validates ownership. Exact lookup is disk-backed. Target normalization and float32 sparse blocks are cached once; sparse top-N results are bounded by query/target block sizes. Cutoff ties use a bounded one-query sparse row, never a dense query-by-corpus product. No full Cartesian product is built.
-
-A shard is written to `.parquet.tmp`, schema/content validated, flushed, and atomically renamed. The JSON manifest commits it afterward. Resume verifies input/vocabulary hashes, effective configuration hash, schema, implementation hashes, dependency versions, shard hashes/row counts, and contiguous shard identity. A crash after rename but before manifest update replays exactly the next uncommitted shard. Unknown orphan files fail. Completed shards are reused; incomplete index construction is rebuilt rather than trusted. An OS lock prevents concurrent writers. Query-count histograms include empty queries and support exact mean, median, p95, and maximum; per-shard source/exact counts, time, RSS, gates, and timestamps are recorded.
-
-**Cloud commands.** First make `configs/data_paths.yaml` resolve the immutable organizer data on the cloud machine. Copy the four existing `artifacts/blocking/S{2,3}_{name,address}_vectorizer.joblib` files. Production defaults reuse these small fitted assets and pin their hashes. No labels are stored in or loaded from them. Setting `runtime.vectorizer_root: null` explicitly fits new bounded samples, but those vocabularies have not received the reported validation measurements. No new package dependency is required.
-
-K40 production:
-
-```sh
-uv run python -m entity_resolution.production_candidates --mode test --profile safe_k40 --run-id test_safe_k40 --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_safe_k40
-```
-
-K20 emergency, including the conservative fallback submission:
-
-```sh
-uv run python -m entity_resolution.production_candidates --mode test --profile emergency_k20 --run-id test_emergency_k20 --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_emergency_k20 --submission-output output
-```
-
-Selected stretch:
-
-```sh
-uv run python -m entity_resolution.production_candidates --mode test --profile stretch_adaptive --enable-rescue --run-id test_stretch_adaptive --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_stretch_adaptive
-```
-
-Resume K40 with exactly the same effective settings:
-
-```sh
-uv run python -m entity_resolution.production_candidates --mode test --profile safe_k40 --run-id test_safe_k40 --data-paths configs/data_paths.yaml --threads 16 --output artifacts/production_candidates/test_safe_k40 --resume
-```
-
-For train generation, replace `--mode test`, the run ID, and output directory with their train equivalents; the generation path still never loads labels. To export the fallback from completed K40 shards, repeat its exact command with both `--resume` and `--submission-output output`. The fallback uses the unchanged `Decoder` with global target ownership and a 0.01 margin on exact-name AND exact-address evidence, then the unchanged `write_submission`. Ambiguous equal-score owners are rejected. This is a tested format-valid submission path, not a trained or calibrated high-score model.
-
-For each production run, candidate output is `artifacts/production_candidates/<run_id>/part-*.parquet`; the authoritative manifest is `artifacts/production_candidates/<run_id>/manifest.json`, and the cache manifest is `index/index.json` beneath that run. Submission output is `output/<run_id>/matching_results.tsv` and `candidate_pairs.tsv`. The disk-backed export map is `artifacts/production_candidates/<run_id>/submission.sqlite`. Export deliberately retains the existing writer’s O(number of S1 IDs) in-memory sort, while candidate-pair mappings and ownership grouping remain on disk.
-
-Reproduce the diagnostic sequence (one retrieval mechanism, then one cached budget repair):
-
-```sh
-uv run python -m entity_resolution.retrieval_rescue --data-paths configs/data_paths.yaml
-uv run python -m entity_resolution.retrieval_rescue --data-paths configs/data_paths.yaml --run-rescue
-uv run python -m entity_resolution.retrieval_rescue --data-paths configs/data_paths.yaml --rebudget 400
-```
-
-This checkout has no local `student_resource` directory. Its executed diagnostic commands used `--data-paths artifacts/retrieval_rescue/data_paths.yaml`, an ignored local configuration resolving the original sibling checkout’s raw files through the same resolver. Existing blocking artifacts were read through the preexisting symlinks. Raw files and existing blocking artifacts were not changed. The new cache and machine-readable report are under `artifacts/retrieval_rescue/`: `context.json`, `evaluation.json`, `rescue_evidence.parquet`, and the small query/audit/missing-address target caches. `evaluation.log`, `rescue_evaluation.log`, and `rebudget.log` capture the executed runs. These generated files are ignored by Git; the measurements and commands are preserved here for the committed handoff.
-
-**Resources and integration limits.** Local diagnostic peak RSS was 1,900.9 MiB (about 1.86 GiB); no full train/test generation was attempted on the 8 GB laptop. With default 1,000-query shards, 20,000-target matrix blocks, and 50,000 vocabulary features, plan roughly 1–4 GiB process RSS for ordinary production records, subject to cloud measurement. A 16-vCPU / 32-GB CPU machine with fast SSD and about 256 GB free disk is a reasonable starting allocation for both safe and stretch artifacts, not a measured minimum.
-
-- `safe_k40` extrapolates to 96,616,830 train and 75,852,509 test candidate rows. At an assumed 80–128 compressed bytes/pair including provenance, test output would be about 5.7–9.0 GiB, excluding indexes.
-- `emergency_k20` extrapolates to 55,483,894 train and 43,559,621 test candidate rows. At an assumed 80–128 compressed bytes/pair including provenance, test output would be about 3.2–5.2 GiB, excluding indexes.
-- `stretch_adaptive` extrapolates to 754,463,550 train and 592,318,678 test candidate rows. At an assumed 80–128 compressed bytes/pair including provenance, test output would be about 44.1–70.6 GiB, excluding indexes.
-
-These volume estimates use a stratified diagnostic sample and are not full-run measurements. In particular production retains all exact matches, while old diagnostic exact channels were capped at 80; full-run exact volume can be larger. The explicit two-million-evidence-row guard fails visibly on pathological shards instead of dropping hard queries. Use smaller shards or an appropriately reviewed higher cloud cap if that guard is reached. K20 reduces downstream output, but retains the shared K80 per-view retrieval setup and does not remove indexing cost.
-
-The prior four sparse channels took about 1,435 seconds for 5,000 queries. A simple old-backend extrapolation is about 176 hours for train or 138 hours for test at its four-thread setting; this is deliberately conservative and includes costs now cached. For a 16-vCPU cloud run, reserve roughly 1–3 days per full mode plus index construction until real shard timing is available. There is no verified full-run time or guaranteed linear thread speedup. Read per-shard timing and index completion on the cloud and update the estimate before relying on a deadline.
-
-Downstream feature/ranker integration must consume the deduplicated pair schema and parse `support_json` for channel-specific features; the primary raw retrieval score is not calibrated across channels. The model lane must still train leakage-safe scores and use the authoritative ownership decoder. Full-corpus cache construction, output volume, throughput, exact-overflow behavior, and full submission validation remain unverified. Small floating-point/tie differences between old diagnostic retrieval and the hardened cached backend are possible. No France/test accuracy is claimed. All held-out thresholds remain unmet, and further retrieval work must address the remaining 150 channel failures before classifier tuning can support the requested final score.
+Machine-readable completed evidence is in ignored `artifacts/retrieval_rescue/score_evaluation_k512.json`, `score_evaluation_k2048.json`, `verified_competitive_adaptive/manifest.json`, and the earlier `evaluation.json`/`context.json`, with source/sample/fold/artifact fingerprints. The discarded lower-depth emergency diagnostic remains an ignored historical artifact and is not the delivered profile. This checkout used `artifacts/retrieval_rescue/data_paths.yaml` to resolve the sibling organizer files through the same data-path loader; raw bytes and existing blocking artifacts were not modified. Generated data is not committed. Full test submissions were produced only on fixtures; full train/test generation was not run locally.

@@ -17,6 +17,11 @@ runtime:
     threshold: 0.20
     top_k: 80
 profiles:
+  fast_submission:
+    # K is nominal: every exact name/address candidate survives.
+    top_k: 40
+    rrf_k: 60
+    preserve_channel_union: true
   safe_k40:
     top_k: 40
     rrf_k: 60
@@ -29,3 +34,36 @@ profiles:
     adaptive: true
     rrf_k: 60
     source_quotas: {S2: 20, S3: 20}
+  competitive_adaptive:
+    top_k: 80
+    expanded_k: 512
+    adaptive: true
+    preserve_channel_union: true
+    rrf_k: 60
+    source_quotas: {S2: 40, S3: 40}
+  max_score:
+    # Preserve every channel's evidence; budgets do not truncate this union.
+    top_k: 80
+    expanded_k: 8192
+    adaptive: true
+    preserve_channel_union: true
+    rrf_k: 60
+    source_quotas: {S2: 40, S3: 40}
+    channel_weights:
+      "S2:name_char_tfidf": 1.0
+      "S3:name_char_tfidf": 1.0
+      "S2:address_char_tfidf": 1.0
+      "S3:address_char_tfidf": 1.0
+profile_rescue:
+  competitive_adaptive: {enabled: true, top_k: 80, threshold: 0.20, gate: weak_query}
+  max_score: {enabled: true, top_k: 2048, threshold: 0.18, gate: weak_query}
+profile_runtime:
+  fast_submission:
+    retrieval_backend: exact_only
+    vectorizer_root: null
+    batch_size: 10000
+    shard_size: 1000
+  max_score:
+    batch_size: 500
+    shard_size: 250
+    memory_cache_mb: 32768

@@ -1319,6 +1319,8 @@ def fuse_budgeted(
     expand together, as in select_candidates. Quotas reserve seats within K; unused
     seats spill into global RRF order. Exact overflow is never discarded. The primary
     channel describes one observation; support_json retains every channel observation.
+    preserve_channel_union keeps every complementary channel candidate, with K used
+    only as a nominal budget diagnostic. Retrieval itself remains bounded upstream.
     """
     columns = [
         "s1_id",
@@ -1338,6 +1340,8 @@ def fuse_budgeted(
     expanded = int(policy.get("expanded_k", k))
     if not 0 < k <= expanded <= 32767:
         raise ValueError("invalid candidate budget")
+    if not isinstance(policy.get("preserve_channel_union", False), bool):
+        raise ValueError("preserve_channel_union must be boolean")
     quotas = policy.get("source_quotas", {})
     channels = policy.get("channel_quotas", {})
     if set(quotas) - {"S2", "S3"} or any(int(v) < 0 for v in quotas.values()):
@@ -1403,6 +1407,8 @@ def fuse_budgeted(
             )
         candidates.sort(key=lambda row: row["_key"])
         chosen = {i for i, row in enumerate(candidates) if row["exact_match"]}
+        if policy.get("preserve_channel_union", False):
+            chosen.update(range(len(candidates)))
 
         def reserve(
             indices: list[int], count: int, *, budget=budget, chosen=chosen, candidates=candidates

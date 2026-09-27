@@ -8,7 +8,6 @@ cache: artifacts/retrieval_rescue
 output: artifacts/retrieval_rescue/evaluation.json
 query_batch_size: 250
 threads: 4
-maximum_rescue_cost: 10000
 rescue:
   enabled: false
   top_k: 20
@@ -38,3 +37,11 @@ policies:
     adaptive: true
     rrf_k: 60
     source_quotas: {S2: 20, S3: 20}
+# Prespecified follow-up budgets are derived from the remaining missing-owner ranks.
+# Candidate volume is reported as a resource cost, never used as a score ceiling.
+score_experiment:
+  missing_address_budgets: [80, 512, 2048]
+  missing_address_threshold: 0.18
+  full_name_budgets: [160, 512, 1024]
+  full_address_budget: 512
+  machine_ram_gb: 128
