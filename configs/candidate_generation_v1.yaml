@@ -1,0 +1,21 @@
+run_id: candidate_generation_v1
+seed: 20260927
+evaluation_sample_size: 5000
+top_k_values: [5, 10, 20, 40, 80]
+country_partition: true
+normalization_view: unicode_preserving
+exact_views: [unicode_preserving, accent_folded]
+sparse_backend: sparse_dot_topn
+sparse_backend_version: 1.2.0
+sparse_threshold: 0.20
+sparse_top_k: 80
+target_chunk_size: 20000
+query_batch_size: 1000
+fit_sample_size: 75000
+tfidf:
+  analyzer: char_wb
+  ngram_range: [3, 5]
+  min_df: 2
+  max_features: 50000
+  sublinear_tf: true
+artifact_root: artifacts/blocking

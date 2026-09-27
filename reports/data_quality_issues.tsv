@@ -1,0 +1,36 @@
+severity	dataset	category	count	detail
+pass	train_ground_truth	unknown_source1_reference	0	Measured by full streaming scan and hash membership against configured sources.
+pass	train_ground_truth	unknown_target_reference	0	Measured by full streaming scan and hash membership against configured sources.
+pass	train_ground_truth	duplicate_id_within_truth_list	0	Measured by full streaming scan and hash membership against configured sources.
+pass	train_ground_truth	source1_id_used_as_target	0	Measured by full streaming scan and hash membership against configured sources.
+pass	train_source1	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S1-.
+pass	train_source1	name_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	train_source1	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	train_source2	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S2-.
+warning	train_source2	name_null_like_literal	6	Literal null-like tokens; organizer values were not rewritten.
+pass	train_source2	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	train_source3	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S3-.
+warning	train_source3	name_null_like_literal	18	Literal null-like tokens; organizer values were not rewritten.
+pass	train_source3	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source1	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S1-.
+pass	test_source1	name_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source1	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source2	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S2-.
+warning	test_source2	name_null_like_literal	49	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source2	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source3	required_columns_unique_ids_source_prefix	0	Full structural validation passed; IDs unique with prefix S3-.
+warning	test_source3	name_null_like_literal	61	Literal null-like tokens; organizer values were not rewritten.
+pass	test_source3	address_null_like_literal	0	Literal null-like tokens; organizer values were not rewritten.
+pass	train_ground_truth	target_linked_to_multiple_source1_entities	0	Exact SQL count of targets with more than one distinct S1 owner.
+warning	train_source1	encoding_and_unicode_controls	70	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=70.
+pass	train_source1	country_labels_open_set	0	Observed labels=['India', 'US']; unseen labels are not intrinsically invalid.
+warning	train_source2	encoding_and_unicode_controls	121	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=121.
+pass	train_source2	country_labels_open_set	0	Observed labels=['India', 'US']; unseen labels are not intrinsically invalid.
+warning	train_source3	encoding_and_unicode_controls	125	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=125.
+pass	train_source3	country_labels_open_set	0	Observed labels=['India', 'US']; unseen labels are not intrinsically invalid.
+warning	test_source1	encoding_and_unicode_controls	72	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=72.
+pass	test_source1	country_labels_open_set	0	Observed labels=['France', 'India', 'US']; unseen labels are not intrinsically invalid.
+warning	test_source2	encoding_and_unicode_controls	183	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=183.
+pass	test_source2	country_labels_open_set	0	Observed labels=['France', 'India', 'US']; unseen labels are not intrinsically invalid.
+warning	test_source3	encoding_and_unicode_controls	162	UTF-8 parse passed; replacement characters=0, unexpected C0 controls=162.
+pass	test_source3	country_labels_open_set	0	Observed labels=['France', 'India', 'US']; unseen labels are not intrinsically invalid.

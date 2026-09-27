@@ -73,6 +73,7 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "seaborn" },
+    { name = "sparse-dot-topn" },
 ]
 
 [package.optional-dependencies]
@@ -109,6 +110,7 @@ requires-dist = [
     { name = "scikit-learn" },
     { name = "scipy" },
     { name = "seaborn" },
+    { name = "sparse-dot-topn", specifier = "==1.2.0" },
 ]
 provides-extras = ["dev"]
 
@@ -985,6 +987,29 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "sparse-dot-topn"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "psutil" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/56/16/1b2e3c206184796c3b47c171bbe7353a5b247ed0021a2dc2e9ce4d7c1b5c/sparse_dot_topn-1.2.0.tar.gz", hash = "sha256:ff648e3959b00bbe41fbf28ff9d44f13c7972403cb307f4729ef9de903958a68", size = 45554, upload-time = "2025-12-16T09:16:17.14Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/52/8252a7f04f77dac3ca63d77a471f2a11b1a2c1eb6530fd7ab8880528d4f9/sparse_dot_topn-1.2.0-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:122028f90d93c927650bcf09d3272b269fa5d95b72b43f36bc09ec5b0c662d05", size = 437621, upload-time = "2025-12-16T09:16:00.046Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/45/8b8394830e3fd82457d90feca4fc1c8136aa5ed76777328c690134232fb2/sparse_dot_topn-1.2.0-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:31927392c81b12260ab67691f6fa314eb8f18dc0f21abe45b5f20ba04ed9cc47", size = 497915, upload-time = "2025-12-16T09:16:01.588Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/f8/d94e68562d84749636a44d3739d3f90865474c0ae4c7bd8fa56420ea9a8a/sparse_dot_topn-1.2.0-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:20816830e53fb0bcc5f55b062c469a05ce72ef4dd56a977814784943611457af", size = 309661, upload-time = "2025-12-16T09:16:02.856Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/95/32ce1807a049e549fd3cf226933e4d1bf741a2d8e2ce697d97a58b59dae3/sparse_dot_topn-1.2.0-cp311-cp311-win_amd64.whl", hash = "sha256:6ee1a0f3eb8c3e9d14e7c8059bb6f0dd45f2601c9722b01bcf92f1476dec2033", size = 412892, upload-time = "2025-12-16T09:16:04.226Z" },
+    { url = "https://files.pythonhosted.org/packages/22/65/da9508f752584cf8748871f63496a3070d112c32b09d64233476855f9e7a/sparse_dot_topn-1.2.0-cp312-abi3-macosx_12_0_arm64.whl", hash = "sha256:96c8f005bc59371fd70f9e94df5a8b6f2f082c262af3837d105a9eb5b478ddc2", size = 435484, upload-time = "2025-12-16T09:16:05.644Z" },
+    { url = "https://files.pythonhosted.org/packages/34/f4/e1b09566b48d91e67a7d60284faa81b701b54964a0dbe49ce48c5c1d50d8/sparse_dot_topn-1.2.0-cp312-abi3-macosx_12_0_x86_64.whl", hash = "sha256:b147e3053609caf464825c07a5ff34f93f9c280eb04d277a78d98be1125b1ef3", size = 496618, upload-time = "2025-12-16T09:16:07.056Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/11/a7d64157a43c81b097d8c2b268181944134e981faf85e9ff525454cefa48/sparse_dot_topn-1.2.0-cp312-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ccfb3a37b5ecce7ac4380a19eebd3045440ecb9cb2958312b133944452329862", size = 309565, upload-time = "2025-12-16T09:16:08.451Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/03/af129ec57b5112495e5bc311d1cde38dc6dca0797ae34b2454a0c5b7748c/sparse_dot_topn-1.2.0-cp312-abi3-win_amd64.whl", hash = "sha256:ad75cfe03dd4489de90716b353b265949ee36ff9146892b6d90191185d600104", size = 411309, upload-time = "2025-12-16T09:16:10.023Z" },
 ]
 
 [[package]]

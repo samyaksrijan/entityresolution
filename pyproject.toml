@@ -21,6 +21,7 @@ dependencies = [
   "scikit-learn",
   "scipy",
   "seaborn",
+  "sparse-dot-topn==1.2.0",
 ]
 
 [project.optional-dependencies]
