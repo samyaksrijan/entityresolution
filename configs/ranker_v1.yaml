@@ -1,0 +1,23 @@
+seed: 42
+fold_count: 5
+batch_size: 2048
+smoke_entities: 200
+max_decode_rows: 500000
+model:
+  iterations: 400
+  depth: 6
+  learning_rate: 0.05
+  l2_leaf_reg: 8.0
+  thread_count: 4
+  used_ram_limit: 2gb
+  border_count: 64
+  early_stopping_rounds: 30
+sampling:
+  negatives_per_positive: 12
+  minimum_negatives: 6
+  per_s1_negative_cap: 36
+  max_sampled_rows: 250000
+decoder_search:
+  thresholds: [0.35, 0.5, 0.7, 0.85, 0.95]
+  top_k: [1, 2, 4]
+  refinement_step: 0.05
